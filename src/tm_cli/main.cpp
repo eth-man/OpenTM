@@ -178,6 +178,8 @@ int main(int argc, char** argv) {
         return owed.transfer + owed.listing + owed.file_op + owed.load + owed.install + owed.ps;
     };
     bool settled  = false;
+    bool agent_up   = false;   // the debug agent announced itself, or is assumed up
+    bool sess_ready = false;   // the DECI3 session handshake has completed
     const bool watching = p.isSet(o_pass) || p.isSet(o_fail);
 
     auto quit_now = [&app, &settled]() {
@@ -396,15 +398,27 @@ int main(int argc, char** argv) {
         if (pending_total() == 0 && !watching) linger_then_quit();
     };
 
+    // Actions need a live session. The agent announcement can land before the
+    // handshake finishes, so --wait-agent alone isn't enough: fire once both are
+    // up, or the verbs bail "session not ready yet" and the run hangs.
+    auto maybe_run_actions = [&]() {
+        if (acted || settled) return;
+        if (!sess_ready) return;
+        if (p.isSet(o_wait) && !agent_up) return;
+        run_actions();
+    };
+
     QObject::connect(&ts, &target_session::session_ready, [&](std::uint16_t tok, std::uint16_t sub) {
         emit_line(QStringLiteral(">>> "), QStringLiteral("session ready (token=0x%1 sub=0x%2)").arg(tok, 4, 16, QChar('0')).arg(sub, 4, 16, QChar('0')));
         if (code == exit_unreachable) code = exit_ok;
+        sess_ready = true;
         run_power();
-        if (!p.isSet(o_wait)) run_actions();
+        maybe_run_actions();
     });
     QObject::connect(&ts, &target_session::debug_agent_ready, [&]() {
         emit_line(QStringLiteral(">>> "), QStringLiteral("debug agent ready"));
-        if (p.isSet(o_wait)) run_actions();
+        agent_up = true;
+        maybe_run_actions();
     });
 
     const int timeout_s = p.value(o_timeout).toInt();
@@ -412,7 +426,8 @@ int main(int argc, char** argv) {
         if (acted || settled) return;
         if (p.isSet(o_wait) && code == exit_ok) {
             emit_line(QStringLiteral(">>> "), QStringLiteral("no agent announcement in %1s - it was probably already up, continuing").arg(timeout_s));
-            run_actions();
+            agent_up = true;
+            maybe_run_actions();
             return;
         }
         emit_line(QStringLiteral("!!  "), QStringLiteral("timeout after %1s waiting for the console").arg(timeout_s));
