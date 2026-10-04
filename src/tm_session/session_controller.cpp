@@ -444,6 +444,8 @@ void session_controller::on_server_rejection(std::uint8_t kind) {
         hint = " - priority already used by another host"; break;
     case dcmp::error_code::nospace:
         hint = " - kit-side dtnetm buffer full"; break;
+    case dcmp::error_code::version:
+        hint = " - protocol version mismatch between host and target"; break;
     default:   break;
     }
     const auto name = QStringLiteral("DCMP_CODE_%1").arg(QString::fromLatin1(dcmp::error_name(kind)));

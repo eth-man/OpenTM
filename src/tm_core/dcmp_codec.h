@@ -45,6 +45,7 @@ inline constexpr std::uint8_t noconnect         = 5;
 inline constexpr std::uint8_t noproto           = 6;
 inline constexpr std::uint8_t priority          = 7;
 inline constexpr std::uint8_t nospace           = 8;
+inline constexpr std::uint8_t version           = 10;  // host/target protocol version mismatch
 }
 
 constexpr const char* status_name(std::uint8_t code) noexcept {
@@ -77,6 +78,7 @@ constexpr const char* error_name(std::uint8_t code) noexcept {
     case error_code::noproto:          return "NOPROTO";
     case error_code::priority:         return "PRIORITY";
     case error_code::nospace:          return "NOSPACE";
+    case error_code::version:          return "VERSION";
     default:                           break;
     }
     return "UNKNOWN";
