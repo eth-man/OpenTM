@@ -49,7 +49,7 @@ TEST_CASE("DBGP: decode process_list reply with one process", "[dbgp]") {
     const auto bytes = from_hex(
         "80000102 00000018 00000004 00000000 00000000"  // header
         "01000500"                                       // payload (1 PID)
-        "a5");                                           // trailer
+        "a5"); // trailer
     const auto r = dbgp::decode_response(bytes);
     REQUIRE(r.has_value());
     REQUIRE(r->cmd         == 0x80000102u);
@@ -77,11 +77,11 @@ TEST_CASE("DBGP: decode user_memory_stat reply", "[dbgp]") {
         "80200008 00000019 0000001c 01000500 00000000"  // header
         "00000000"          // shared_created
         "00010000"          // shared_attached
-        "186b0000"          // local_memory   (390.7 MB)
-        "00060000"          // local_text     (384 KB)
-        "000c0000"          // prx_text       (768 KB)
-        "00050000"          // prx_data       (320 KB)
-        "003a6000"          // remain         (3.6 MB)
+        "186b0000"          // local_memory (390.7 MB)
+        "00060000"          // local_text (384 KB)
+        "000c0000"          // prx_text (768 KB)
+        "00050000"          // prx_data (320 KB)
+        "003a6000"          // remain (3.6 MB)
         "18");
     const auto r = dbgp::decode_response(bytes);
     REQUIRE(r.has_value());
@@ -112,4 +112,58 @@ TEST_CASE("DBGP: decode thread_list reply", "[dbgp]") {
     REQUIRE(r->data_len == 36u);
     REQUIRE(r->process_id  == 0x01000500u);
     REQUIRE(r->result_code == 0u);
+}
+
+// --- request-body byte layouts: lock the wire format so a refactor cannot silently
+// shift a field. These are the bytes the agent actually receives. ---
+
+TEST_CASE("DBGP: read_memory / register / LS request bodies", "[dbgp]") {
+    REQUIRE(dbgp::build_read_memory_request_body(0x8000000012345678ull, 0x100)
+            == from_hex("8000000012345678 00000100"));
+    REQUIRE(dbgp::build_read_ppu_registers_request_body(0x0100050000000000ull)
+            == from_hex("0100050000000000"));
+    REQUIRE(dbgp::build_read_spu_registers_request_body(0x0100008600000000ull)
+            == from_hex("0100008600000000"));
+    REQUIRE(dbgp::build_read_spu_local_store_request_body(0x0100008600000000ull, 0x3e800, 0x800)
+            == from_hex("0100008600000000 0003e800 00000800"));
+}
+
+TEST_CASE("DBGP: DABR watchpoint control flags match sys/dbg.h", "[dbgp]") {
+    // SYS_DBG_DABR_CTRL_READ/WRITE/CLEAR, verbatim from the SDK header.
+    REQUIRE(dbgp::dabr_ctrl::read  == 0x5ull);
+    REQUIRE(dbgp::dabr_ctrl::write == 0x6ull);
+    REQUIRE(dbgp::dabr_ctrl::clear == 0x0ull);
+}
+
+TEST_CASE("DBGP: set_data_watchpoint request body = [addr][ctrl], both u64 BE", "[dbgp]") {
+    REQUIRE(dbgp::build_set_data_watchpoint_request_body(0x0000000012345678ull, dbgp::dabr_ctrl::write)
+            == from_hex("0000000012345678 0000000000000006"));
+    REQUIRE(dbgp::build_set_data_watchpoint_request_body(0x00000000deadbe00ull, dbgp::dabr_ctrl::read)
+            == from_hex("00000000deadbe00 0000000000000005"));
+    // clear: ctrl = 0
+    REQUIRE(dbgp::build_set_data_watchpoint_request_body(0, dbgp::dabr_ctrl::clear)
+            == from_hex("0000000000000000 0000000000000000"));
+}
+
+TEST_CASE("DBGP: get_data_watchpoint reply parses [addr][ctrl]", "[dbgp]") {
+    const auto bytes = from_hex(
+        "80200009 00000030 00000010 00000000 00000000"   // header, result_code=0, data_len=16
+        "0000000012345678"                                // addr
+        "0000000000000006"                                // ctrl = WRITE
+        "a5");
+    const auto r = dbgp::decode_response(bytes);
+    REQUIRE(r.has_value());
+    const auto s = dbgp::parse_data_watchpoint(*r);
+    REQUIRE(s.has_value());
+    REQUIRE(s->addr == 0x12345678ull);
+    REQUIRE(s->ctrl == dbgp::dabr_ctrl::write);
+}
+
+TEST_CASE("DBGP: breakpoint request body = [tid][addr] (INFERRED, locked here)", "[dbgp]") {
+    // Body is inferred from Sony's PS3AddBreakPoint(proc, thread, addr, 1); the process id
+    // rides the dbgp header, so the body carries the thread id + address. If a live reply
+    // later shows a different layout, change build_breakpoint_request_body AND this test
+    // together -- the test is the record of what we currently send.
+    REQUIRE(dbgp::build_breakpoint_request_body(0x0100050000000000ull, 0x0000000000010000ull)
+            == from_hex("0100050000000000 0000000000010000"));
 }

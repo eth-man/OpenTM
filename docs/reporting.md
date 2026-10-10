@@ -50,7 +50,7 @@ If you built it yourself rather than using a release, say which branch.
 
 OpenTM runs a small session server in the background that holds console sessions, and **it outlives the window**. If you replace the files with a newer build while it is still running, the old server keeps serving and any fix appears not to work.
 
-Quit from the **tray icon** - not just the window - before testing a new build. The log line beginning `-- session server built ...` tells you which one actually answered.
+Quit from the **tray icon** - not just the window - before testing a new build. The log line beginning `-- session server built...` tells you which one actually answered.
 
 ## Extra detail by area
 

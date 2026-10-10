@@ -145,7 +145,7 @@ target_record from_variant(const QVariant& v) {
     target_record r;
     const auto m = v.toMap();
     r.id   = m.value("id").toString();
-    if (r.id.isEmpty()) r.id = new_target_id();   // migrate pre-id settings
+    if (r.id.isEmpty()) r.id = new_target_id(); // migrate pre-id settings
     r.name = m.value("name").toString();
     const auto type_str = m.value("type").toString().toStdString();
     if (auto t = target_type_from_string(type_str)) r.type = *t;
@@ -166,8 +166,8 @@ target_record from_variant(const QVariant& v) {
     r.timeouts.reconnect_ms = to_int("to_reconnect", r.timeouts.reconnect_ms);
     r.timeouts.game_port_ms = to_int("to_game_port", r.timeouts.game_port_ms);
     r.timeouts.game_exit_ms = to_int("to_game_exit", r.timeouts.game_exit_ms);
-    auto lo_b = [&m](const char* k, bool d) {const auto v = m.value(k); return v.isValid() ? v.toBool() : d; };
-    auto lo_u = [&m](const char* k, quint64 d) {const auto v = m.value(k); return v.isValid() ? v.toULongLong() : d; };
+    auto lo_b = [&m](const char* k, bool d) {const auto v = m.value(k); return v.isValid()? v.toBool(): d; };
+    auto lo_u = [&m](const char* k, quint64 d) {const auto v = m.value(k); return v.isValid()? v.toULongLong(): d; };
     auto& L = r.load;
     L.use_elf_stack        = lo_b("lo_use_elf_stack", L.use_elf_stack);
     L.stack_size           = static_cast<std::uint32_t>(lo_u("lo_stack_size", L.stack_size));
@@ -192,7 +192,7 @@ target_record from_variant(const QVariant& v) {
     L.memory_access_trap   = lo_b("lo_mat",           L.memory_access_trap);
     L.game_attribute       = static_cast<std::uint8_t>(lo_u("lo_game_attr", L.game_attribute));
     L.patch_boot           = lo_b("lo_patch_boot",    L.patch_boot);
-    auto lo_s = [&m](const char* k, const QString& d) {const auto v = m.value(k); return v.isValid() ? v.toString() : d; };
+    auto lo_s = [&m](const char* k, const QString& d) {const auto v = m.value(k); return v.isValid()? v.toString(): d; };
     L.paramsfo_mapping         = lo_b("lo_paramsfo_map",    L.paramsfo_mapping);
     L.paramsfo_use_elf_dir     = lo_b("lo_paramsfo_elfdir", L.paramsfo_use_elf_dir);
     L.paramsfo_path            = lo_s("lo_paramsfo_path",   L.paramsfo_path);
@@ -491,7 +491,7 @@ void target_panel::edit_properties() {
     if (!current_target(cur, &idx)) return;
     auto* dlg = new target_properties_dialog(cur, this);
     connect(dlg, &target_properties_dialog::applied, this, [this, idx](const target_record& r) {
-        if (!idx.isValid()) return;   // row removed while the dialog was open
+        if (!idx.isValid()) return; // row removed while the dialog was open
         set_target_row(idx, r);
         save_targets();
     });
@@ -704,7 +704,7 @@ void target_panel::load_targets() {
         append_target_row(from_variant(m));
     }
     s.endArray();
-    if (migrated) save_targets();   // persist ids minted for pre-id targets
+    if (migrated) save_targets(); // persist ids minted for pre-id targets
 }
 
 void target_panel::save_targets() const {
@@ -725,7 +725,7 @@ void target_panel::save_targets() const {
             const auto r = from_variant(v);
             s.setArrayIndex(i++);
             const auto m = to_variant(r).toMap();
-            for (auto it = m.constBegin(); it != m.constEnd(); ++it) {
+            for (auto it = m.constBegin(); it!= m.constEnd(); ++it) {
                 s.setValue(it.key(), it.value());
             }
         }

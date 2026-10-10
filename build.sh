@@ -17,12 +17,12 @@ DO_CLEAN=0
 
 for arg in "$@"; do
     case "${arg,,}" in
-        release) CONFIG="Release"; PRESET="linux-release" ;;
-        debug)   CONFIG="Debug";   PRESET="linux-debug" ;;
+        release) CONFIG="Release"; PRESET="linux-release";;
+        debug)   CONFIG="Debug"; PRESET="linux-debug";;
         vcpkg)   PRESET="linux-debug-vcpkg" ;;
         run)     RUN_AFTER=1 ;;
         clean)   DO_CLEAN=1 ;;
-        *)       echo "[build.sh] unknown arg: ${arg}"; exit 2 ;;
+        *)       echo "[build.sh] unknown arg: ${arg}"; exit 2;;
     esac
 done
 

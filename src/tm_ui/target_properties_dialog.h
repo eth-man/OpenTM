@@ -121,9 +121,9 @@ private:
     struct xmb_editor {
         QString    section;
         QString    key;
-        QLineEdit* editor = nullptr;   // set for free form values
-        QComboBox* combo  = nullptr;   // set for keys with named values
-        QCheckBox* check  = nullptr;   // set for plain 0/1 flags
+        QLineEdit* editor = nullptr; // set for free form values
+        QComboBox* combo  = nullptr; // set for keys with named values
+        QCheckBox* check  = nullptr; // set for plain 0/1 flags
         std::vector<opentm::tm_core::sft_choice> choices;
     };
     QCheckBox*                     xmb_override_ = nullptr;

@@ -55,14 +55,14 @@ TEST_CASE("SFT: round-trips through serialise", "[sft]") {
 
     const auto text = a.serialise();
     REQUIRE(text.startsWith("\r\n[Version]\r\n"));
-    REQUIRE_FALSE(text.contains("\n\n"));   // no bare LF anywhere
+    REQUIRE_FALSE(text.contains("\n\n")); // no bare LF anywhere
 }
 
 TEST_CASE("SFT: set updates in place and appends otherwise", "[sft]") {
     auto s = sft_settings::parse(kConsoleDump);
     s.set("System", "nickname", "B00DEX");
     REQUIRE(s.value("System", "nickname") == "B00DEX");
-    REQUIRE(s.sections()[1].entries.size() == 3);   // updated, not appended
+    REQUIRE(s.sections()[1].entries.size() == 3); // updated, not appended
 
     s.set("System", "newKey", "7");
     REQUIRE(s.sections()[1].entries.size() == 4);
@@ -124,5 +124,5 @@ TEST_CASE("SFT: tolerates LF-only input and stray lines", "[sft]") {
     const auto s = sft_settings::parse("[System]\nnickname=x\njunk-with-no-equals\n; comment\nk=v");
     REQUIRE(s.value("System", "nickname") == "x");
     REQUIRE(s.value("System", "k") == "v");
-    REQUIRE(s.sections()[0].entries.size() == 2);   // junk + comment dropped
+    REQUIRE(s.sections()[0].entries.size() == 2); // junk + comment dropped
 }

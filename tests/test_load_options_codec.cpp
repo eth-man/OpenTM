@@ -83,7 +83,7 @@ TEST_CASE("a partial object changes only what it names", "[load_options]") {
     const auto o = load_options_from_json(j);
     REQUIRE(o.wait_for_bdvd);
     REQUIRE(o.stack_size == 0x200u);
-    REQUIRE(o.clear_streams);          // untouched default
+    REQUIRE(o.clear_streams); // untouched default
     REQUIRE_FALSE(o.enable_debug_module);
 }
 

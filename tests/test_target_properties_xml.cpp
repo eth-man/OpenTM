@@ -71,7 +71,7 @@ target_record populated() {
 TEST_CASE("target properties survive an XML round-trip", "[props_xml]") {
     const target_record in = populated();
 
-    target_record out;   // defaults - everything must come from the file
+    target_record out; // defaults - everything must come from the file
     QString error;
     REQUIRE(target_properties_from_xml(target_properties_to_xml(in), out, &error));
     REQUIRE(error.isEmpty());
@@ -159,12 +159,12 @@ TEST_CASE("TM's own export parses", "[props_xml]") {
 
     CHECK(r.home_dir == QStringLiteral("D:\\C++\\cellmark\\build"));
     CHECK(r.force_case_sensitive == false);
-    CHECK(r.timeouts.load_ms == 15000);          // 0x3A98
+    CHECK(r.timeouts.load_ms == 15000); // 0x3A98
     CHECK(r.load.priority == 0x3e9u);
     CHECK(r.load.stack_size == 0x40u);
     CHECK(r.display_reset_settings == true);
     CHECK(r.file_serving_log_size == 0x1000);
-    CHECK(r.reset_mode == target_record::reset_release_mode);   // 2
+    CHECK(r.reset_mode == target_record::reset_release_mode); // 2
     CHECK(r.reset_boot_value == 0x10u);
     CHECK(r.reset_boot_mask == 0x11u);
 }

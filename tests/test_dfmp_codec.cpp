@@ -122,7 +122,7 @@ TEST_CASE("get_entries: typeless root entries decode as directories", "[dfmp]") 
         }
     };
 
-    put_be32(20, 2);                       // entry count
+    put_be32(20, 2); // entry count
 
     put_be32(kHeader + 0x0c, 1);
     put_be32(kHeader + 0x10, 0x00000000);
@@ -135,7 +135,7 @@ TEST_CASE("get_entries: typeless root entries decode as directories", "[dfmp]") 
     const auto entries = parse_get_entries_reply(body);
     REQUIRE(entries.size() == 2);
     CHECK(entries[0].name == "dev_hdd0");
-    CHECK(entries[0].is_directory());       // would fail without the fix
+    CHECK(entries[0].is_directory()); // would fail without the fix
     CHECK(entries[1].name == "game_debug");
     CHECK(entries[1].is_directory());
 }
@@ -157,11 +157,11 @@ TEST_CASE("DFMP transfer body matches real TM, both directions", "[dfmp]") {
             host_transfer_path("C:/Users/dev/Desktop/boot_plugins.txt"),
             0x26);
 
-        REQUIRE(body.size() == 2144);       // 32 metadata + two 1056 slots
+        REQUIRE(body.size() == 2144); // 32 metadata + two 1056 slots
         CHECK(u32_at(body, 0x00) == dfmp_file_op_kind::transfer);
         CHECK(u32_at(body, 0x04) == 3);
         CHECK(u32_at(body, 0x08) == 1);
-        CHECK(u32_at(body, 0x10) == 0);     // no mtime when pulling
+        CHECK(u32_at(body, 0x10) == 0); // no mtime when pulling
         CHECK(u32_at(body, 0x18) == 0x26);
         CHECK(u32_at(body, 0x1C) == 3);
         CHECK(text_at(body, 0x020) == "/dev_hdd0/boot_plugins.txt");
@@ -178,8 +178,8 @@ TEST_CASE("DFMP transfer body matches real TM, both directions", "[dfmp]") {
 
         REQUIRE(body.size() == 2144);
         CHECK(u32_at(body, 0x00) == dfmp_file_op_kind::transfer);
-        CHECK(u32_at(body, 0x04) == 1);          // differs from a pull
-        CHECK(u32_at(body, 0x08) == 0);          // differs from a pull
+        CHECK(u32_at(body, 0x04) == 1); // differs from a pull
+        CHECK(u32_at(body, 0x08) == 0); // differs from a pull
         CHECK(u32_at(body, 0x10) == 0x6a07ff87); // source mtime
         CHECK(u32_at(body, 0x18) == 0x80);
         CHECK(u32_at(body, 0x1C) == 1);
@@ -236,9 +236,9 @@ TEST_CASE("chmod and utime bodies match the captured TM frames", "[dfmp]") {
         const auto body = build_utime_body(1154554478ull, 1154554088ull, path);
         REQUIRE(body.size() == 24 + dfmp_path_slot);
         CHECK(read_be_u32(body.data() + 0) == dfmp_file_op_kind::utime);
-        CHECK(read_be_u32(body.data() + 8) == 0);           // high word of atime
-        CHECK(read_be_u32(body.data() + 12) == 0x44d11a6e);  // atime
-        CHECK(read_be_u32(body.data() + 20) == 0x44d118e8);  // mtime
+        CHECK(read_be_u32(body.data() + 8) == 0); // high word of atime
+        CHECK(read_be_u32(body.data() + 12) == 0x44d11a6e); // atime
+        CHECK(read_be_u32(body.data() + 20) == 0x44d118e8); // mtime
         CHECK(std::string(reinterpret_cast<const char*>(body.data() + 24)) == path);
     }
 

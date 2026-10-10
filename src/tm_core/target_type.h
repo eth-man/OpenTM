@@ -7,8 +7,8 @@
 namespace opentm::tm_core {
 
 enum class target_type : std::uint8_t {
-    decr_tcp,    // PS3_DEH_TCP   - DECR series. TCP/8530. NETMP+TSMP+DFMP.
-    cfw_dex,     // PS3_DBG_DEX   - debug station or retail running CFW/DEX. TCP/1000. NETMP_CFW+TSMP+DFMP
+    decr_tcp,    // PS3_DEH_TCP - DECR series. TCP/8530. NETMP+TSMP+DFMP.
+    cfw_dex,     // PS3_DBG_DEX - debug station or retail running CFW/DEX. TCP/1000. NETMP_CFW+TSMP+DFMP
     core_dump,   // PS3_CORE_DUMP - some bs
     unknown,
 };
@@ -35,9 +35,9 @@ struct target_timeouts {
     int reset_ms     = 60000;
     int connect_ms   = 30000;
     int load_ms      = 60000;
-    int status_ms    = 700;  
+    int status_ms    = 700;
     int reconnect_ms = 60000;
-    int game_port_ms = 0;    
+    int game_port_ms = 0;
     int game_exit_ms = 10000;
 };
 

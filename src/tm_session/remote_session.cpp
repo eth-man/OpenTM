@@ -176,7 +176,7 @@ void remote_session::adopt_state(const QJsonObject& r) {
         emit connection_state_changed(state_);
     }
     if (session_ready_ && !was_ready) {
-        emit session_ready(0, 0);   
+        emit session_ready(0, 0);
         emit debug_agent_ready(); 
     }
 }

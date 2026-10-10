@@ -1,17 +1,17 @@
 // opentm_cli - one-shot DECI3 driver.
 //
-//   opentm_cli --host 192.0.2.11 --type dex --ls /dev_hdd0/
-//   opentm_cli --host 192.0.2.10 --serve C:/work/build --load build/foo.self
-//   opentm_cli --host 192.0.2.10 --power-on --wait-agent --load build/foo.self
-//              --pass-on "RESULT: OK" --fail-on "ASSERT"
+// opentm_cli --host 192.0.2.11 --type dex --ls /dev_hdd0/
+// opentm_cli --host 192.0.2.10 --serve C:/work/build --load build/foo.self
+// opentm_cli --host 192.0.2.10 --power-on --wait-agent --load build/foo.self
+// --pass-on "RESULT: OK" --fail-on "ASSERT"
 //
 // The exit code reports the operation, not the connection:
-//   0 everything asked for succeeded
-//   1 usage error
-//   2 could not reach the console, or the session never came up
-//   3 timed out waiting for the agent, a reply or a pattern
-//   4 the target refused an operation (lv2 status, transfer result)
-//   5 --fail-on matched
+// 0 everything asked for succeeded
+// 1 usage error
+// 2 could not reach the console, or the session never came up
+// 3 timed out waiting for the agent, a reply or a pattern
+// 4 the target refused an operation (lv2 status, transfer result)
+// 5 --fail-on matched
 
 #include <tm_session/target_session.h>
 
@@ -171,7 +171,7 @@ int main(int argc, char** argv) {
 
     target_session ts;
 
-    int  code     = exit_unreachable;   // until a session proves otherwise
+    int  code     = exit_unreachable; // until a session proves otherwise
     bool acted    = false;
     struct { int transfer = 0, listing = 0, file_op = 0, load = 0, install = 0, ps = 0; } owed;
     auto pending_total = [&owed]() {
@@ -256,7 +256,7 @@ int main(int argc, char** argv) {
         done_one(owed.file_op, status == 0 ? exit_ok : exit_refused);
     });
     QObject::connect(&ts, &target_session::transfer_finished, [&]() {
-        if (owed.transfer <= 0) return;   // the agent's own settings push
+        if (owed.transfer <= 0) return; // the agent's own settings push
         emit_line(QStringLiteral(">>> "), QStringLiteral("transfer complete"));
         done_one(owed.transfer, exit_ok);
     });

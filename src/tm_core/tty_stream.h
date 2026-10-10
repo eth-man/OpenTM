@@ -1,8 +1,8 @@
 // verified against captures:
-//   0x01000300  setmonitor "Warning: unavailable resolution"  stream 3
-//   0x01010200  setmonitor "monitorType = 9 ... OK"           stream 2
-//   0x01020200  game stdout (b00_load_from_disk)              stream 2
-//   0x01000500  "[DA]: [LAUNCH_GAME_PARAM] reply failed"      stream 5
+// 0x01000300 setmonitor "Warning: unavailable resolution" stream 3
+// 0x01010200 setmonitor "monitorType = 9... OK" stream 2
+// 0x01020200 game stdout (b00_load_from_disk) stream 2
+// 0x01000500 "[DA]: [LAUNCH_GAME_PARAM] reply failed" stream 5
 // TODO: add more streams since TM support it
 #pragma once
 

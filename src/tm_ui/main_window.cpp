@@ -132,7 +132,7 @@ void main_window::closeEvent(QCloseEvent* event) {
 main_window::target_slot* main_window::slot_for(const target_record& r, const QPersistentModelIndex& idx)
 {
     if (r.id.isEmpty()) return nullptr;
-    if (const auto it = slots_.constFind(r.id); it != slots_.constEnd()) {
+    if (const auto it = slots_.constFind(r.id); it!= slots_.constEnd()) {
         (*it)->row = idx;
         return *it;
     }
@@ -751,7 +751,7 @@ void main_window::build_target_dock() {
     connect(target_panel_, &target_panel::selection_changed, this, &main_window::on_target_selection_changed);
     connect(target_panel_, &target_panel::target_record_changed, this,
             [this](const target_record& r) {
-        if (const auto it = slots_.constFind(r.id); it != slots_.constEnd()) {
+        if (const auto it = slots_.constFind(r.id); it!= slots_.constEnd()) {
             (*it)->session->set_target(r);
         }
     });
@@ -890,7 +890,7 @@ void main_window::update_state_indicator(opentm::tm_core::tcp_connection::state 
     case state::disconnected:      color = "#888888"; text = tr("Disconnected"); break;
     case state::tcp_connecting:    color = "#dca42c"; text = tr("Connecting"); break;
     case state::awaiting_greeting: color = "#dca42c"; text = tr("Handshake"); break;
-    case state::ready: color = "#3ea65a"; text = (session_ && session_->is_session_ready()) ? tr("Ready (session)") : tr("Ready");
+    case state::ready: color = "#3ea65a"; text = (session_ && session_->is_session_ready())? tr("Ready (session)"): tr("Ready");
     break;
     case state::error_state:       color = "#c43c3c"; text = tr("Error"); break;
     }
@@ -1145,7 +1145,7 @@ void main_window::on_session_invalidated() {
 
 void main_window::on_debug_agent_ready(target_slot* slot) {
     QTimer::singleShot(150, this, [this, slot]() {
-        if (!slots_.values().contains(slot)) return;   // closed meanwhile
+        if (!slots_.values().contains(slot)) return; // closed meanwhile
         if (!slot->session->is_session_ready()) return;
         slot->session->list_directory(slot->files->current_path());
         slot->session->refresh_process_list();

@@ -1,8 +1,8 @@
-//   offset size  field
-//   0      2     type      0x0021 in every frame observed so far
-//   2      2     length    inner length, INCLUDING these 4 header bytes
-//   4      2     cmd       e.g. 0x0206, 0x0202
-//   6      N     body      op-specific (length 6 bytes)
+// offset size field
+// 0 2 type 0x0021 in every frame observed so far
+// 2 2 length inner length, INCLUDING these 4 header bytes
+// 4 2 cmd e.g. 0x0206, 0x0202
+// 6 N body op-specific (length 6 bytes)
 //
 // shared by netmp (HM/MH) and netmp_cfw (MT/TM) direction
 
@@ -23,11 +23,11 @@ inline constexpr std::uint16_t tsmp_type_default = 0x0021;
 // cmd word is (group << 8) | code 
 // observed on decr 1000:
 //
-//   0x01  tsm version              0x21  LPAR status (108 byte reply)
-//   0x02  session: connect/version 0x30  boot parameters (get 0x00, set 0x02)
-//         /login/logout            0x31  boot parameters currently in effect
-//   0x04  logical console mode     0x32  system parameters
-//   0x05  ip display mode          0x20  system control (below)
+// 0x01 tsm version 0x21 LPAR status (108 byte reply)
+// 0x02 session: connect/version 0x30 boot parameters (get 0x00, set 0x02)
+// /login/logout 0x31 boot parameters currently in effect
+// 0x04 logical console mode 0x32 system parameters
+// 0x05 ip display mode 0x20 system control (below)
 //
 // groups 0x04 and 0x05 back settings the cp's own web UI never exposes, its lcnslsrv radio group is commented out in be_param.cgi
 //
@@ -35,25 +35,25 @@ inline constexpr std::uint16_t tsmp_type_default = 0x0021;
 // sending a reboot where a power off was meant looks like the target spontaneously restarting
 namespace tsmp_cmd {
 
-inline constexpr std::uint16_t status    = 0x2000u;  // reply 0x2001
-inline constexpr std::uint16_t power_on  = 0x2002u;  // reply 0x2003
-inline constexpr std::uint16_t power_off = 0x2004u;  // forced terminate, reply 0x2005
-inline constexpr std::uint16_t reset     = 0x2006u;  // forced reboot, reply 0x2007
-inline constexpr std::uint16_t shutdown  = 0x2008u;  // graceful, reply 0x2009
-inline constexpr std::uint16_t reboot    = 0x200Au;  // graceful, reply 0x200B
+inline constexpr std::uint16_t status    = 0x2000u; // reply 0x2001
+inline constexpr std::uint16_t power_on  = 0x2002u; // reply 0x2003
+inline constexpr std::uint16_t power_off = 0x2004u; // forced terminate, reply 0x2005
+inline constexpr std::uint16_t reset     = 0x2006u; // forced reboot, reply 0x2007
+inline constexpr std::uint16_t shutdown  = 0x2008u; // graceful, reply 0x2009
+inline constexpr std::uint16_t reboot    = 0x200Au; // graceful, reply 0x200B
 
 // accepted by the client library but rejected by the CP firmware result 0x0005 ("not supported")
 inline constexpr std::uint16_t resume    = 0x200Cu;
 inline constexpr std::uint16_t suspend   = 0x200Eu;
 
-inline constexpr std::uint16_t get_boot_param = 0x3000u;  // reply 0x3001
-inline constexpr std::uint16_t set_boot_param = 0x3002u;  // reply 0x3003
-inline constexpr std::uint16_t get_cur_param  = 0x3100u;  // in effect now, reply 0x3101
-inline constexpr std::uint16_t get_sys_param  = 0x3200u;  // reply 0x3201
+inline constexpr std::uint16_t get_boot_param = 0x3000u; // reply 0x3001
+inline constexpr std::uint16_t set_boot_param = 0x3002u; // reply 0x3003
+inline constexpr std::uint16_t get_cur_param  = 0x3100u; // in effect now, reply 0x3101
+inline constexpr std::uint16_t get_sys_param  = 0x3200u; // reply 0x3201
 
-inline constexpr std::uint16_t lpar_status    = 0x2100u;  // reply 0x2101
-inline constexpr std::uint16_t tsm_version    = 0x0100u;  // reply 0x0101
-inline constexpr std::uint16_t get_lcnsl_mode = 0x0400u;  // logical console, reply 0x0401
+inline constexpr std::uint16_t lpar_status    = 0x2100u; // reply 0x2101
+inline constexpr std::uint16_t tsm_version    = 0x0100u; // reply 0x0101
+inline constexpr std::uint16_t get_lcnsl_mode = 0x0400u; // logical console, reply 0x0401
 inline constexpr std::uint16_t get_showip_mode = 0x0500u; // IP display, reply 0x0501
 
 constexpr std::uint16_t reply_of(std::uint16_t request) noexcept {
@@ -93,9 +93,9 @@ struct tsmp_frame {
 };
 
 // wire layout: 32 bytes per entry, entries starting at message offset 12:
-//   +0x00  char[16]  name, nul padded
-//   +0x10  u64 BE    status
-//   +0x18  u64 BE    detail
+// +0x00 char[16] name, nul padded
+// +0x10 u64 BE status
+// +0x18 u64 BE detail
 struct tsmp_lpar_entry {
     std::string   name;
     std::uint64_t status = 0;
@@ -108,7 +108,7 @@ struct tsmp_lpar_entry {
 // decr has no PS2 silicon so neither can run
 namespace tsmp_lpar_state {
 inline constexpr std::uint64_t down    = 0;
-inline constexpr std::uint64_t suspend = 1;   // reportable, but see tsmp_cmd
+inline constexpr std::uint64_t suspend = 1; // reportable, but see tsmp_cmd
 inline constexpr std::uint64_t up      = 2;
 }
 

@@ -83,7 +83,7 @@ private:
 
     rpc_client    rpc_;
     target_record record_;
-    QString       handle_;   // server-side session key, stable across renames
+    QString       handle_; // server-side session key, stable across renames
 
     enum class open_state { none, pending, ok, failed };
     open_state    open_state_ = open_state::none;

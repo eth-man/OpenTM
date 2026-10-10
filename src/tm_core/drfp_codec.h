@@ -1,21 +1,21 @@
 // odd code
-//   0 / 1   INIT
-//   2 / 3   OPEN
-//   4 / 5   CLOSE
-//   6 / 7   READ
-//   8 / 9   WRITE
-//  10 / 11  SEEK
-//  12 / 13  FSTAT
-//  14 / 15  STAT
-//  16 / 17  MKDIR
-//  18 / 19  RMDIR
-//  20 / 21  DOPEN
-//  22 / 23  DCLOSE
-//  24 / 25  DREAD
-//  26 / 27  FTRUNCATE
-//  28 / 29  TRUNCATE
-//  30 / 31  RENAME
-//  32 / 33  UNLINK
+// 0 / 1 INIT
+// 2 / 3 OPEN
+// 4 / 5 CLOSE
+// 6 / 7 READ
+// 8 / 9 WRITE
+// 10 / 11 SEEK
+// 12 / 13 FSTAT
+// 14 / 15 STAT
+// 16 / 17 MKDIR
+// 18 / 19 RMDIR
+// 20 / 21 DOPEN
+// 22 / 23 DCLOSE
+// 24 / 25 DREAD
+// 26 / 27 FTRUNCATE
+// 28 / 29 TRUNCATE
+// 30 / 31 RENAME
+// 32 / 33 UNLINK
 
 #pragma once
 
@@ -89,14 +89,14 @@ inline constexpr std::uint8_t directory = 1;
 inline constexpr std::uint8_t file      = 2;
 } // namespace drfp_dtype
 
-//   u32 mode           // see drfp_mode above
-//   u32 unknown_a      // wire bytes 0xFFFFFFFF (dev?)
-//   u32 unknown_b      // wire bytes 0xFFFFFFFF (rdev?)
-//   u64 mtime          // unix seconds (big-endian)
-//   u64 atime
-//   u64 ctime
-//   u32 unknown_c      // 0
-//   u32 size           // file size in bytes
+// u32 mode // see drfp_mode above
+// u32 unknown_a // wire bytes 0xFFFFFFFF (dev?)
+// u32 unknown_b // wire bytes 0xFFFFFFFF (rdev?)
+// u64 mtime // unix seconds (big-endian)
+// u64 atime
+// u64 ctime
+// u32 unknown_c // 0
+// u32 size // file size in bytes
 struct drfp_stat {
     std::uint32_t mode      = 0x8180;
     std::uint32_t unknown_a = 0xffffffffu;

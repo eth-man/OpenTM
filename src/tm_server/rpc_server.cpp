@@ -148,7 +148,7 @@ rpc_server::managed* rpc_server::open_target(const QJsonObject& p, QString& err)
     // adhoc callers such as the CLI get the name as their handle
     const QString handle = r.id.isEmpty() ? r.name : r.id;
 
-    if (auto it = sessions_.constFind(handle); it != sessions_.constEnd()) {
+    if (auto it = sessions_.constFind(handle); it!= sessions_.constEnd()) {
         auto* have_m = *it;
         const auto have = have_m->session->target();
         if (have.host != r.host || have.port != r.port || have.type != r.type) {
@@ -201,10 +201,10 @@ void rpc_server::close_target(const QString& handle) {
 rpc_server::managed* rpc_server::resolve_target(const QJsonObject& p, QString& err) {
     const auto want = p.value("target").toString();
     if (!want.isEmpty()) {
-        if (const auto it = sessions_.constFind(want); it != sessions_.constEnd()) {
+        if (const auto it = sessions_.constFind(want); it!= sessions_.constEnd()) {
             return *it;
         }
-        // handle miss: fall back to the display name so the cli  stays usable
+        // handle miss: fall back to the display name so the cli stays usable
         for (auto* m : sessions_) {
             if (m->name == want) return m;
         }
@@ -344,7 +344,7 @@ void rpc_server::register_methods() {
     add("server.methods", false, false, false, "List available methods and their requirements.",
         [this](managed*, const QJsonObject&, QString&) {
             QJsonArray arr;
-            for (auto it = methods_.constBegin(); it != methods_.constEnd(); ++it) {
+            for (auto it = methods_.constBegin(); it!= methods_.constEnd(); ++it) {
                 arr.append(QJsonObject{{"method", it.key()}, {"mutating", it->mutating}, {"needs_target", it->needs_target}, {"needs_session", it->needs_session}, {"help", QLatin1String(it->help)}});
             }
             return QJsonObject{{"methods", arr}};

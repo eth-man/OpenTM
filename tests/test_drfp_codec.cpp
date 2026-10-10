@@ -39,7 +39,7 @@ TEST_CASE("DRFP: build STAT reply matches TM wire bytes", "[drfp]") {
         "00000000" "6a08e4b8"   // atime
         "00000000" "6a08e441"   // ctime
         "00000000"              // unknown_c
-        "00150510");            // size (1377552 bytes)
+        "00150510"); // size (1377552 bytes)
 
     drfp_stat st;
     st.mode      = 0x00008180u;
@@ -100,8 +100,8 @@ TEST_CASE("DRFP: dirent is a fixed 258-byte struct", "[drfp]") {
     // struct { u8 d_type; u8 d_namesize; signed char d_name[256]; }
     const auto e = build_dirent(drfp_dtype::directory, QByteArray("abc"));
     REQUIRE(e.size() == 258);
-    REQUIRE(static_cast<unsigned char>(e[0]) == 1u);  // DRFP_DT_DIRECTORY
-    REQUIRE(static_cast<unsigned char>(e[1]) == 3u);  // namesize
+    REQUIRE(static_cast<unsigned char>(e[0]) == 1u); // DRFP_DT_DIRECTORY
+    REQUIRE(static_cast<unsigned char>(e[1]) == 3u); // namesize
     REQUIRE(e.mid(2, 3) == QByteArray("abc"));
     REQUIRE(e.mid(5, 253) == QByteArray(253, '\0')); // NUL padding
 

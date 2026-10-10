@@ -41,7 +41,7 @@ QString sibling_executable(const QString& base_name) {
 
 bool ensure_supervisor(QString* err, int wait_ms) {
     if (!single_instance::request(QLatin1String(supervisor_socket), verb("status"), 800).isEmpty()) {
-        return true;   // already up
+        return true; // already up
     }
 
     const auto exe = sibling_executable(QStringLiteral("opentm_tray"));

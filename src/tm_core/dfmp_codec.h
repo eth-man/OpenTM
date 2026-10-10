@@ -1,16 +1,16 @@
 // inner framing for DECI3 cat=0x0200 DFMP payloads, the family the kits file management rides on
 //
 // outer header, inside a cat=0x0200 envelope:
-//   +0x00 u32  cmd              high bit set on replies
-//   +0x04 u32  seq              replies echo the requests seq
-//   +0x08 u32  body_length      NOT counting the 1 byte frame trailer
-//   +0x0c u32  status_or_flags  0 on requests, lv2 status on replies
-//   +0x10 ...  body
+// +0x00 u32 cmd high bit set on replies
+// +0x04 u32 seq replies echo the requests seq
+// +0x08 u32 body_length NOT counting the 1 byte frame trailer
+// +0x0c u32 status_or_flags 0 on requests, lv2 status on replies
+// +0x10... body
 //
 // per op body header, the next 8 bytes:
-//   +0x00 u16  param_a usually a flag word
-//   +0x02 u16  param_b usually a mode/handle slot
-//   +0x04 u32  param_c usually a size hint or per op id
+// +0x00 u16 param_a usually a flag word
+// +0x02 u16 param_b usually a mode/handle slot
+// +0x04 u32 param_c usually a size hint or per op id
 //
 // most path bearing ops then have 4 reserved bytes and a nul terminated path in a fixed 1kb byte slot, so a body is typically ~1064 bytes
 
@@ -56,13 +56,13 @@ namespace dfmp_file_op_kind {
 
 // path = directory to enumerate
 // res:
-//   +0x00 u32 BE  reserved (zero)
-//   +0x04 u32 BE  entry size (typically 0x1b = 27)
-//   +0x08 u32 BE  reserved (zero)
-//   +0x0C u32 BE  reserved (zero)
-//   +0x10 u32 BE  reserved (zero)
-//   +0x14 u32 BE  entry count
-//   +0x18 ...     entry array, each entry per kit side struct (88 bytes)
+// +0x00 u32 BE reserved (zero)
+// +0x04 u32 BE entry size (typically 0x1b = 27)
+// +0x08 u32 BE reserved (zero)
+// +0x0C u32 BE reserved (zero)
+// +0x10 u32 BE reserved (zero)
+// +0x14 u32 BE entry count
+// +0x18... entry array, each entry per kit side struct (88 bytes)
 inline constexpr std::uint32_t get_entries  = 0x0000001Au;
 
 // path = file to delete
@@ -72,14 +72,14 @@ inline constexpr std::uint32_t remove       = 0x00000008u;
 // reply body carries mode at +0x12 (u16, e.g. 0x81a4 = S_IFREG|0644), three timestamps at +0x20/+0x28/+0x30 and the size at +0x38 (u64).
 inline constexpr std::uint32_t stat          = 0x0000001Cu;
 
-//   +0x00  u32  this kind (0x12)
-//   +0x04  u32  3 pulling to the host, 1 pushing to the target
-//   +0x08  u32  1 pulling to the host, 0 pushing to the target
-//   +0x10  u32  source mtime when pushing, 0 when pulling
-//   +0x18  u32  size of the file being moved
-//   +0x1C  u32  repeats +0x04
-//   +0x20  path slot, source
-//   +0x440 path slot, destination
+// +0x00 u32 this kind (0x12)
+// +0x04 u32 3 pulling to the host, 1 pushing to the target
+// +0x08 u32 1 pulling to the host, 0 pushing to the target
+// +0x10 u32 source mtime when pushing, 0 when pulling
+// +0x18 u32 size of the file being moved
+// +0x1C u32 repeats +0x04
+// +0x20 path slot, source
+// +0x440 path slot, destination
 
 inline constexpr std::uint32_t transfer      = 0x00000012u;
 
@@ -110,22 +110,22 @@ inline constexpr std::uint32_t utime         = 0x00000018u;
 
 } // namespace dfmp_file_op_kind
 
-//   +0x00 u32 BE  reserved (sometimes carries an index in the first entry)
-//   +0x04 u32 BE  zero
-//   +0x08 u32 BE  zero
-//   +0x0C u32 BE  type/valid flag (= 1 for valid entries)
-//   +0x10 u32 BE  mode, unix style
-//   +0x14 u32 BE  zero (padding)
-//   +0x18 u32 BE  ctime (posix seconds)
-//   +0x1C u32 BE  zero
-//   +0x20 u32 BE  atime
-//   +0x24 u32 BE  zero
-//   +0x28 u32 BE  mtime
-//   +0x2C u32 BE  zero
-//   +0x30 u32 BE  block_size / sub-flag
+// +0x00 u32 BE reserved (sometimes carries an index in the first entry)
+// +0x04 u32 BE zero
+// +0x08 u32 BE zero
+// +0x0C u32 BE type/valid flag (= 1 for valid entries)
+// +0x10 u32 BE mode, unix style
+// +0x14 u32 BE zero (padding)
+// +0x18 u32 BE ctime (posix seconds)
+// +0x1C u32 BE zero
+// +0x20 u32 BE atime
+// +0x24 u32 BE zero
+// +0x28 u32 BE mtime
+// +0x2C u32 BE zero
+// +0x30 u32 BE block_size / sub-flag
 
 struct dfmp_frame {
-    std::uint32_t       cmd            = 0;   // full u32
+    std::uint32_t       cmd            = 0; // full u32
     std::uint32_t       seq            = 0;
     std::uint32_t       status_or_flags = 0;
     std::vector<std::byte> body; // bytes after 16b headerd

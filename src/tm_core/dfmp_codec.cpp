@@ -49,26 +49,26 @@ std::vector<dfmp_file_entry> parse_get_entries_reply(
 {
     // all multi byte fields are BE
     //
-    //   +0x00 u32  reserved (sometimes carries the entry index for the (first record, unused now)
-    //   +0x04 u32  zero
-    //   +0x08 u32  zero
-    //   +0x0C u32  type/valid flag (= 1 for valid entries)
-    //   +0x10 u32  mode unix style 0x41ff = S_IFDIR|0777, 0x81xx = file
-    //   +0x14 u32  zero padding
-    //   +0x18 u32  ctime in posix seconds
-    //   +0x1C u32  zero
-    //   +0x20 u32  atime
-    //   +0x24 u32  zero
-    //   +0x28 u32  mtime
-    //   +0x2C u32  zero
-    //   +0x30 u32  block_size / flag (0x200 or 0x400)
-    //   +0x34 char[] name, nul terminated, fills the rest of the entry slot
+    // +0x00 u32 reserved (sometimes carries the entry index for the (first record, unused now)
+    // +0x04 u32 zero
+    // +0x08 u32 zero
+    // +0x0C u32 type/valid flag (= 1 for valid entries)
+    // +0x10 u32 mode unix style 0x41ff = S_IFDIR|0777, 0x81xx = file
+    // +0x14 u32 zero padding
+    // +0x18 u32 ctime in posix seconds
+    // +0x1C u32 zero
+    // +0x20 u32 atime
+    // +0x24 u32 zero
+    // +0x28 u32 mtime
+    // +0x2C u32 zero
+    // +0x30 u32 block_size / flag (0x200 or 0x400)
+    // +0x34 char[] name, nul terminated, fills the rest of the entry slot
     //
     //
     // res:
-    //   24 bytes before the entry array is:
-    //   +0x00..+0x10 reserved (mostly zero, +0x07 = 0x1b protocol marker?)
-    //   +0x14 u32 BE entry count
+    // 24 bytes before the entry array is:
+    // +0x00..+0x10 reserved (mostly zero, +0x07 = 0x1b protocol marker?)
+    // +0x14 u32 BE entry count
     std::vector<dfmp_file_entry> entries;
     constexpr std::size_t reply_header = 24;
     if (reply_body.size() < reply_header) return entries;
@@ -113,9 +113,9 @@ std::vector<std::byte> build_path_op_body(
     std::string_view path)
 {
     // body layout after the 16 byte outer header:
-    //   +0x00 u32 BE  param_c  (sub op discriminator, like 0x36 OpenDir)
-    //   +0x04 u32 BE  reserved (zero)
-    //   +0x08 ...  path bytes + nul padded to fill the 1056 byte path slot
+    // +0x00 u32 BE param_c (sub op discriminator, like 0x36 OpenDir)
+    // +0x04 u32 BE reserved (zero)
+    // +0x08... path bytes + nul padded to fill the 1056 byte path slot
     constexpr std::size_t inner_header = 8;
     std::vector<std::byte> body(inner_header + dfmp_path_slot, std::byte{0});
     std::byte* p = body.data();
@@ -238,9 +238,9 @@ std::vector<dfmp_file_entry> parse_get_entries_reply_dex(
         dfmp_file_entry fe;
         // rexpress the drfp d_type as the unix mode bits the rest of the codebase (plus dfmp_file_entry::is_directory) expects
         switch (read_be_u32(reply_body, base + kType)) {
-        case 1:  fe.mode = 0x4000u; break;   // dir
-        case 2:  fe.mode = 0x8000u; break;   // normal file
-        default: fe.mode = 0u;      break;
+        case 1:  fe.mode = 0x4000u; break; // dir
+        case 2:  fe.mode = 0x8000u; break; // normal file
+        default: fe.mode = 0u; break;
         }
         std::string name;
         for (std::size_t k = base + kName; k < base + kStride; ++k) {

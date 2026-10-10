@@ -15,8 +15,8 @@ class file_properties_dialog : public QDialog {
     Q_OBJECT
 public:
     struct values {
-        std::uint32_t mode  = 0;   // full st_mode, file type bits included
-        std::uint64_t atime = 0;   // posix seconds
+        std::uint32_t mode  = 0; // full st_mode, file type bits included
+        std::uint64_t atime = 0; // posix seconds
         std::uint64_t mtime = 0;
         std::uint64_t ctime = 0;
     };

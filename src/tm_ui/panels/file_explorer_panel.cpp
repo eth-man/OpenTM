@@ -59,12 +59,12 @@ QString format_mode(std::uint32_t mode) {
     QChar type = '?';
     const std::uint32_t fmt = mode & 0xF000u;
     switch (fmt) {
-        case 0x4000u: type = 'd'; break;  // S_IFDIR
-        case 0x8000u: type = '-'; break;  // S_IFREG
-        case 0xA000u: type = 'l'; break;  // S_IFLNK
-        case 0x2000u: type = 'c'; break;  // S_IFCHR
-        case 0x6000u: type = 'b'; break;  // S_IFBLK
-        case 0x1000u: type = 'p'; break;  // S_IFIFO
+        case 0x4000u: type = 'd'; break; // S_IFDIR
+        case 0x8000u: type = '-'; break; // S_IFREG
+        case 0xA000u: type = 'l'; break; // S_IFLNK
+        case 0x2000u: type = 'c'; break; // S_IFCHR
+        case 0x6000u: type = 'b'; break; // S_IFBLK
+        case 0x1000u: type = 'p'; break; // S_IFIFO
         default:      type = '-'; break;
     }
     QString s;
@@ -237,13 +237,13 @@ file_explorer_panel::file_explorer_panel(QWidget* parent)
     view_->horizontalHeader()->setStretchLastSection(true);
     view_->horizontalHeader()->setHighlightSections(false);
     view_->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    view_->setColumnWidth(0, 240);  // Name (icon + text)
-    view_->setColumnWidth(1, 70);   // Extension
-    view_->setColumnWidth(2, 90);   // Size
-    view_->setColumnWidth(3, 100);  // Mode
-    view_->setColumnWidth(4, 140);  // Modified
-    view_->setColumnWidth(5, 140);  // Created
-    view_->setColumnWidth(6, 140);  // Accessed
+    view_->setColumnWidth(0, 240); // Name (icon + text)
+    view_->setColumnWidth(1, 70); // Extension
+    view_->setColumnWidth(2, 90); // Size
+    view_->setColumnWidth(3, 100); // Mode
+    view_->setColumnWidth(4, 140); // Modified
+    view_->setColumnWidth(5, 140); // Created
+    view_->setColumnWidth(6, 140); // Accessed
     outer->addWidget(view_, 1);
 
     // nav hook
@@ -331,7 +331,7 @@ void file_explorer_panel::record_history(const QString& path) {
 void file_explorer_panel::go_back() {
     if (history_pos_ <= 0) return;
     --history_pos_;
-    in_history_nav_ = true;   // cleared when the listing arrives
+    in_history_nav_ = true; // cleared when the listing arrives
     emit list_directory_requested(history_.value(history_pos_));
     update_nav_buttons();
 }
@@ -339,7 +339,7 @@ void file_explorer_panel::go_back() {
 void file_explorer_panel::go_forward() {
     if (history_pos_ + 1 >= static_cast<int>(history_.size())) return;
     ++history_pos_;
-    in_history_nav_ = true;   // cleared when the listing arrives
+    in_history_nav_ = true; // cleared when the listing arrives
     emit list_directory_requested(history_.value(history_pos_));
     update_nav_buttons();
 }
@@ -350,7 +350,7 @@ void file_explorer_panel::update_nav_buttons() {
 }
 
 void file_explorer_panel::mousePressEvent(QMouseEvent* e) {
-    if (e->button() == Qt::BackButton)         { go_back();    e->accept(); return; }
+    if (e->button() == Qt::BackButton)         { go_back(); e->accept(); return; }
     if (e->button() == Qt::ForwardButton)      { go_forward(); e->accept(); return; }
     QWidget::mousePressEvent(e);
 }
@@ -358,7 +358,7 @@ void file_explorer_panel::mousePressEvent(QMouseEvent* e) {
 bool file_explorer_panel::eventFilter(QObject* obj, QEvent* e) {
     if (e->type() == QEvent::MouseButtonPress) {
         const auto btn = static_cast<QMouseEvent*>(e)->button();
-        if (btn == Qt::BackButton)    { go_back();    return true; }
+        if (btn == Qt::BackButton)    { go_back(); return true; }
         if (btn == Qt::ForwardButton) { go_forward(); return true; }
     }
     return QWidget::eventFilter(obj, e);

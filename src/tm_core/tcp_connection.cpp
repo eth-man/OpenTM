@@ -60,7 +60,7 @@ void tcp_connection::connect_to_target(const QHostAddress& host, std::uint16_t p
 
 void tcp_connection::disconnect_from_target() {
     bool all_down = true;
-    for (auto it = sockets_.rbegin(); it != sockets_.rend(); ++it) {
+    for (auto it = sockets_.rbegin(); it!= sockets_.rend(); ++it) {
         if ((*it)->state() != QAbstractSocket::UnconnectedState) {
             (*it)->disconnectFromHost();
         }
@@ -86,7 +86,7 @@ bool tcp_connection::disconnect_and_wait(int timeout_ms) {
         return true;
     };
     bool ok = true;
-    for (auto it = sockets_.rbegin(); it != sockets_.rend(); ++it) {
+    for (auto it = sockets_.rbegin(); it!= sockets_.rend(); ++it) {
         ok = close_one(*it) && ok;
     }
     set_state(state::disconnected);
@@ -147,7 +147,7 @@ void tcp_connection::on_connected(which w) {
 
 void tcp_connection::on_any_disconnected() {
     reset_buffers();
-    for (auto it = sockets_.rbegin(); it != sockets_.rend(); ++it) {
+    for (auto it = sockets_.rbegin(); it!= sockets_.rend(); ++it) {
         if ((*it)->state() != QAbstractSocket::UnconnectedState) (*it)->abort();
     }
     set_state(state::disconnected);

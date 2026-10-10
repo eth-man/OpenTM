@@ -1,15 +1,15 @@
 //
-//   req header (16 bytes):
-//     +0x00 4B  cmd          (request command id)
-//     +0x04 4B  req_id       (echoed back in reply)
-//     +0x08 4B  data_len     (size of payload in bytes)
-//     +0x0C 4B  process_id   (target PID is zero for whole system queries)
-//   res header (20 bytes):
-//     +0x00 4B  cmd          (0x80000000 | request cmd)
-//     +0x04 4B  req_id       (echoed)
-//     +0x08 4B  data_len     (size of payload that follows)
-//     +0x0C 4B  process_id
-//     +0x10 4B  result_code  (0 = OK)
+// req header (16 bytes):
+// +0x00 4B cmd (request command id)
+// +0x04 4B req_id (echoed back in reply)
+// +0x08 4B data_len (size of payload in bytes)
+// +0x0C 4B process_id (target PID is zero for whole system queries)
+// res header (20 bytes):
+// +0x00 4B cmd (0x80000000 | request cmd)
+// +0x04 4B req_id (echoed)
+// +0x08 4B data_len (size of payload that follows)
+// +0x0C 4B process_id
+// +0x10 4B result_code (0 = OK)
 //
 
 #pragma once
@@ -53,10 +53,10 @@ std::optional<response> decode_response(std::span<const std::byte> bytes);
 std::vector<std::uint32_t> parse_process_list(const response& r);
 
 // res payload:
-//   +0x00 u32  PPU thread count (n)
-//   +0x04 u32  SPU thread group count (m)
-//   +0x08 ...  N x u64 ppu thread ids
-//   ...        M x u32 spu thread group ids
+// +0x00 u32 PPU thread count (n)
+// +0x04 u32 SPU thread group count (m)
+// +0x08... N x u64 ppu thread ids
+//... M x u32 spu thread group ids
 struct thread_list {
     std::vector<std::uint64_t> ppu_thread_ids;
     std::vector<std::uint32_t> spu_thread_group_ids;
@@ -64,13 +64,13 @@ struct thread_list {
 std::optional<thread_list> parse_thread_list(const response& r);
 
 // res payload:
-//   +0x00 u64  ppu thread id
-//   +0x08 u32  priority
-//   +0x0C u32  state (0=IDLE 1=RUNNABLE 2=ONPROC 3=SLEEP 6=STOP 7=ZOMBIE 8=DEAD)
-//   +0x10 u64  stack addr
-//   +0x18 u64  stack size
-//   +0x20 u32  base priority
-//   +0x24 ...  nul terminated thread name (0 - 128 bytes)
+// +0x00 u64 ppu thread id
+// +0x08 u32 priority
+// +0x0C u32 state (0=IDLE 1=RUNNABLE 2=ONPROC 3=SLEEP 6=STOP 7=ZOMBIE 8=DEAD)
+// +0x10 u64 stack addr
+// +0x18 u64 stack size
+// +0x20 u32 base priority
+// +0x24... nul terminated thread name (0 - 128 bytes)
 struct ppu_thread_info {
     std::uint64_t thread_id     = 0;
     std::uint32_t priority      = 0;
@@ -87,18 +87,18 @@ const char* ppu_thread_state_name(std::uint32_t state) noexcept;
 
 // req payload empty, header PID=<target>.
 // res payload
-//   +0x00 u32  status
-//   +0x04 u32  ppu thread count
-//   +0x08 u32  spu thread count
-//   +0x0C u32  raw spu count
-//   +0x10 u32  parent pid
-//   +0x14 u64  max physical memory size
-//   +0x1C ...  nul terminated self path (0-512 bytes)
-//   variable 32B ppu guid
-//   variable 32B reserved
-//   variable 4B  flags about following info (0x00000001 = valid)
-//   variable 4B  debug flags
-//   variable 136B debug param
+// +0x00 u32 status
+// +0x04 u32 ppu thread count
+// +0x08 u32 spu thread count
+// +0x0C u32 raw spu count
+// +0x10 u32 parent pid
+// +0x14 u64 max physical memory size
+// +0x1C... nul terminated self path (0-512 bytes)
+// variable 32B ppu guid
+// variable 32B reserved
+// variable 4B flags about following info (0x00000001 = valid)
+// variable 4B debug flags
+// variable 136B debug param
 
 struct process_info {
     std::uint32_t status                 = 0;
@@ -116,13 +116,13 @@ std::optional<process_info> parse_process_info_ex2(const response& r);
 
 // req payload empty, header PID=<target>.
 // res payload (28 bytes):
-//   +0x00 u32  created shared memory size
-//   +0x04 u32  attached shared memory size
-//   +0x08 u32  process local memory size
-//   +0x0C u32  process local text size
-//   +0x10 u32  text size of prx
-//   +0x14 u32  data size of prx
-//   +0x18 u32  remaining memory size
+// +0x00 u32 created shared memory size
+// +0x04 u32 attached shared memory size
+// +0x08 u32 process local memory size
+// +0x0C u32 process local text size
+// +0x10 u32 text size of prx
+// +0x14 u32 data size of prx
+// +0x18 u32 remaining memory size
 struct user_memory_stat {
     std::uint32_t shared_created   = 0;
     std::uint32_t shared_attached  = 0;
@@ -136,15 +136,15 @@ std::optional<user_memory_stat> parse_user_memory_stat(const response& r);
 
 // req payload: u32 module handle at +0x00.
 // res layout
-//   +0x000  8B   sizeof module
-//   +0x008 30B   name (nul pad ascii)
-//   +0x026  2B   ver (high byte = major, low = minor)
-//   +0x028  4B   attr
-//   +0x02C  4B   start entry
-//   +0x030  4B   stop entry
-//   +0x034 512B  program#m filename
-//   +0x234  4B   no of segments
-//   +0x238  ...  segmenets, each 56 bytes = 7 x u64: base, file_size, mem_size, seg_num, seg_type, attr_flags, align
+// +0x000 8B sizeof module
+// +0x008 30B name (nul pad ascii)
+// +0x026 2B ver (high byte = major, low = minor)
+// +0x028 4B attr
+// +0x02C 4B start entry
+// +0x030 4B stop entry
+// +0x034 512B program#m filename
+// +0x234 4B no of segments
+// +0x238... segmenets, each 56 bytes = 7 x u64: base, file_size, mem_size, seg_num, seg_type, attr_flags, align
 struct prx_segment {
     std::uint64_t base        = 0;
     std::uint64_t file_size   = 0;
@@ -183,7 +183,7 @@ struct mutex_info {
     std::uint32_t attr_adaptive      = 0;
     std::uint64_t key                = 0;
     std::uint32_t flags              = 0;
-    std::string   name;              // 8 bytes per spec but ascii / nul pad
+    std::string   name; // 8 bytes per spec but ascii / nul pad
     std::uint64_t owner_thread_id    = 0;
     std::uint32_t lock_counter       = 0;
     std::uint32_t cond_ref_counter   = 0;

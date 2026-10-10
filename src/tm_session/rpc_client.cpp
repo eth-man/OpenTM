@@ -99,7 +99,7 @@ void rpc_client::handle_message(const QJsonObject& msg) {
     }
     const int id = msg.value("id").toInt(-1);
     const auto it = pending_.find(id);
-    if (it == pending_.end()) return;   // no handler registered
+    if (it == pending_.end()) return; // no handler registered
 
     const auto handler = *it;
     pending_.erase(it);
