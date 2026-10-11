@@ -39,7 +39,7 @@ private:
         opentm::tm_core::target_type kind = opentm::tm_core::target_type::unknown;
         QTcpSocket*   sock = nullptr;
         QTimer*       timer = nullptr;
-        bool          greeted = false;   // answered our version probe as DECI3
+        bool          greeted = false; // answered our version probe as DECI3
     };
 
     void on_connected(probe* p);

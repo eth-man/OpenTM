@@ -42,6 +42,16 @@ public slots:
     void resume_process(std::uint32_t pid);
     void pause_process(std::uint32_t pid);
     void terminate_process(std::uint32_t pid);
+    void attach_process(std::uint32_t pid);
+    void read_memory(std::uint32_t pid, std::uint64_t addr, std::uint32_t size);
+    void read_ppu_registers(std::uint32_t pid, std::uint64_t tid);
+    void read_spu_registers(std::uint32_t pid, std::uint64_t tid);
+    void read_spu_local_store(std::uint32_t pid, std::uint64_t tid, std::uint32_t offset, std::uint32_t size);
+    void set_data_watchpoint(std::uint32_t pid, std::uint64_t addr, std::uint64_t ctrl);
+    void get_data_watchpoint(std::uint32_t pid);
+    void set_breakpoint(std::uint32_t pid, std::uint64_t tid, std::uint64_t addr, bool spu);
+    void clear_breakpoint(std::uint32_t pid, std::uint64_t tid, std::uint64_t addr, bool spu);
+    void list_breakpoints(std::uint32_t pid, bool spu);
     void on_frame_received(opentm::tm_core::deci3_frame f);
 
 signals:
@@ -54,6 +64,18 @@ signals:
     void conds_ready(std::uint32_t pid, QList<opentm::tm_core::dbgp::cond_info> entries);
     void event_queues_ready(std::uint32_t pid, QList<opentm::tm_core::dbgp::event_queue_info> entries);
     void containers_ready(std::uint32_t pid, QList<opentm::tm_core::dbgp::container_info> entries);
+    void memory_read_ready(std::uint64_t addr, QByteArray data);
+    void memory_read_failed(std::uint64_t addr, std::uint32_t result);
+    void ppu_regs_ready(std::uint64_t tid, QByteArray data);
+    void ppu_regs_failed(std::uint64_t tid, std::uint32_t result);
+    void spu_regs_ready(std::uint64_t tid, QByteArray data);
+    void spu_regs_failed(std::uint64_t tid, std::uint32_t result);
+    void spu_ls_ready(std::uint64_t offset, QByteArray data);
+    void spu_ls_failed(std::uint64_t offset, std::uint32_t result);
+    void watchpoint_set_done(std::uint32_t result);
+    void watchpoint_info(std::uint64_t addr, std::uint64_t ctrl, std::uint32_t result);
+    void breakpoint_done(std::uint64_t addr, std::uint32_t result);
+    void breakpoints_listed(QByteArray raw, std::uint32_t result);
 
 private:
     struct pending {
@@ -70,6 +92,10 @@ private:
     };
 
     std::uint32_t send_dbgp(std::uint32_t cmd, std::uint32_t pid, const std::vector<std::byte>& body, std::uint32_t handle = 0);
+
+    QHash<std::uint32_t, std::uint64_t> read_addr_; // seq -> address, for read_memory replies
+    QHash<std::uint32_t, std::uint64_t> read_tid_; // seq -> ppu thread id, for read_ppu_registers replies
+    QHash<std::uint32_t, std::uint64_t> op_addr_; // seq -> address, for breakpoint set/clear replies
 
     void on_process_list_reply(const opentm::tm_core::dbgp::response& r);
     void on_process_info_reply(const opentm::tm_core::dbgp::response& r, std::uint32_t pid);

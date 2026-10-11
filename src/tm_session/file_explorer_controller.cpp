@@ -39,11 +39,11 @@ void file_explorer_controller::list_directory(const QString& path) {
         return dbgshl_frame(dbgshl_sb, cmd, seq, body);
     };
     // devkit: 32 bytes header + two 1056 bytes path slots = 2144 (0x860)
-    // dex:     8 byte header + one  1056 byte path slot = 1064 (0x428)
+    // dex: 8 byte header + one 1056 byte path slot = 1064 (0x428)
     //
-    //   0x0020000f param_c=0x08  settings file  -> reply body 0x10
-    //   0x0020000f param_c=0x1a  list directory -> reply body 0x398
-    //   0x00200013 param_c=0x36  per-nav query  -> reply body 0x18
+    // 0x0020000f param_c=0x08 settings file -> reply body 0x10
+    // 0x0020000f param_c=0x1a list directory -> reply body 0x398
+    // 0x00200013 param_c=0x36 per-nav query -> reply body 0x18
     if (session_->is_cfw_dex()) {
         constexpr int kDexPathSlot = 1056;
         auto dex_body = [](std::uint32_t param_c, const QByteArray& p) {
@@ -102,27 +102,27 @@ void file_explorer_controller::list_directory(const QString& path) {
             session_->mark_dbgshl_stream_open();
         } else {
         //
-        //   +0x00 u32 BE  param_c   = 0x12 (xfer)
-        //   +0x04 u32 BE  mode      = 0x02
-        //   +0x08 u32 BE  reserved
-        //   +0x0C u32 BE  reserved
-        //   +0x10 u32 BE  timestamp in posix sec
-        //   +0x14 u32 BE  reserved
-        //   +0x18 u32 BE  file_size (src file size in bytes)
-        //   +0x1C u32 BE  flags     = 0x02
-        //   +0x20 [1056]  source path, nul pad
-        //   +0x440 [1056] dest path, and nul pad
+        // +0x00 u32 BE param_c = 0x12 (xfer)
+        // +0x04 u32 BE mode = 0x02
+        // +0x08 u32 BE reserved
+        // +0x0C u32 BE reserved
+        // +0x10 u32 BE timestamp in posix sec
+        // +0x14 u32 BE reserved
+        // +0x18 u32 BE file_size (src file size in bytes)
+        // +0x1C u32 BE flags = 0x02
+        // +0x20 [1056] source path, nul pad
+        // +0x440 [1056] dest path, and nul pad
         //
         QByteArray xfer_body;
         xfer_body.reserve(2144);
         auto push_be_u32_qb = [&xfer_body](std::uint32_t v) { append_be_u32(xfer_body, v); };
         push_be_u32_qb(0x00000012u); // +0x00 param_c = transfer
         push_be_u32_qb(0x00000002u); // +0x04 mode = 2
-        push_be_u32_qb(0);           // +0x08 reserved
-        push_be_u32_qb(0);           // +0x0C reserved
+        push_be_u32_qb(0); // +0x08 reserved
+        push_be_u32_qb(0); // +0x0C reserved
         const auto now = static_cast<std::uint32_t>(QDateTime::currentSecsSinceEpoch() & 0xffffffffu);
-        push_be_u32_qb(now);         // +0x10 timestamp
-        push_be_u32_qb(0);           // +0x14 reserved
+        push_be_u32_qb(now); // +0x10 timestamp
+        push_be_u32_qb(0); // +0x14 reserved
         push_be_u32_qb(0x000000A7u); // +0x18 file_size (PS3SETTINGS.SFT size)
         push_be_u32_qb(0x00000002u); // +0x1C flags
 

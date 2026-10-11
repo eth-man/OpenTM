@@ -51,7 +51,7 @@ inline QVector<tty_channel> default_tty_channels() {
         tty_channel c;
         c.name    = QString::fromLatin1(sv.data(), static_cast<int>(sv.size()));
         c.streams = {s};
-        c.enabled = (s == 0x00 || s == 0x02);   // TM, PPU
+        c.enabled = (s == 0x00 || s == 0x02); // TM, PPU
         out.push_back(c);
     }
     return out;

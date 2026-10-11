@@ -58,7 +58,7 @@ private:
     find_dialog*          find_   = nullptr;
     QTabWidget*           tabs_   = nullptr;
     QVector<tty_channel>  channels_;
-    QVector<channel_view> views_;          // parallel to channels_
+    QVector<channel_view> views_; // parallel to channels_
     // stream number -> indices into channels_/views_. 
     // Rebuilt once per set_channels() so the hot path is a hash lookup, not a scan
     QHash<std::uint8_t, QVector<int>> routes_;

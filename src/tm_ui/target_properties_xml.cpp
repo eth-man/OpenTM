@@ -135,8 +135,8 @@ QByteArray target_properties_to_xml(const target_record& r) {
     w.writeAttribute(QStringLiteral("GcmCaptureMode"),   yn(r.load.gcm_capture_mode));
     w.writeEndElement();
 
-    w.writeEndElement();   // OpenTM
-    w.writeEndElement();   // Target
+    w.writeEndElement(); // OpenTM
+    w.writeEndElement(); // Target
     w.writeEndDocument();
     return out;
 }

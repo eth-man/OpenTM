@@ -5,9 +5,9 @@
 #include <QtGlobal>
 
 #ifdef Q_OS_WIN
-#  include <winsock2.h>
+# include <winsock2.h>
 #else
-#  include <sys/socket.h>
+# include <sys/socket.h>
 #endif
 
 namespace opentm::tm_core {

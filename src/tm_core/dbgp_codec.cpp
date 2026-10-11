@@ -158,6 +158,56 @@ std::optional<user_memory_stat> parse_user_memory_stat(const response& r) {
     return s;
 }
 
+std::vector<std::byte> build_read_memory_request_body(std::uint64_t address, std::uint32_t size) {
+    std::vector<std::byte> body;
+    append_be_u64(body, address);
+    append_be_u32(body, size);
+    return body;
+}
+
+std::vector<std::byte> build_read_ppu_registers_request_body(std::uint64_t tid) {
+    std::vector<std::byte> body;
+    append_be_u64(body, tid);
+    return body;
+}
+
+std::vector<std::byte> build_read_spu_registers_request_body(std::uint64_t tid) {
+    std::vector<std::byte> body;
+    append_be_u64(body, tid);
+    return body;
+}
+
+std::vector<std::byte> build_read_spu_local_store_request_body(std::uint64_t tid, std::uint32_t offset, std::uint32_t size) {
+    std::vector<std::byte> body;
+    append_be_u64(body, tid);
+    append_be_u32(body, offset);
+    append_be_u32(body, size);
+    return body;
+}
+
+std::vector<std::byte> build_set_data_watchpoint_request_body(std::uint64_t addr, std::uint64_t ctrl) {
+    std::vector<std::byte> body;
+    append_be_u64(body, addr);
+    append_be_u64(body, ctrl);
+    return body;
+}
+
+std::optional<dabr_state> parse_data_watchpoint(const response& r) {
+    if (r.payload.size() < 16) return std::nullopt;
+    const std::span<const std::byte> p(r.payload.data(), r.payload.size());
+    dabr_state s;
+    s.addr = read_be_u64(p, 0);
+    s.ctrl = read_be_u64(p, 8);
+    return s;
+}
+
+std::vector<std::byte> build_breakpoint_request_body(std::uint64_t tid, std::uint64_t address) {
+    std::vector<std::byte> body;
+    append_be_u64(body, tid);
+    append_be_u64(body, address);
+    return body;
+}
+
 std::vector<std::byte> build_prx_info_request_body(std::uint32_t handle) {
     std::vector<std::byte> body;
     body.reserve(4);
@@ -260,15 +310,15 @@ std::optional<lwmutex_info> parse_lwmutex_info(const response& r) {
     const auto p = payload_view(r);
     // layout of the abcd0001 records, offsets given relative to the handle (the 8 byte tag+length precedes it)
     //
-    //   +0x00 u32 handle
-    //   +0x04 u32 attr_protocol
-    //   +0x08 u32 attr_recursive
-    //   +0x0c 8B  lv2 sync names are 8 bytes, not 16
-    //   +0x14 u32 reserved
-    //   +0x18 u32 owner thread id  0xFFFFFFFF = never locked
-    //   +0x1c u32 lock counter
-    //   +0x20 u32 waiter count
-    //   +0x24 ... u32 waiter ids
+    // +0x00 u32 handle
+    // +0x04 u32 attr_protocol
+    // +0x08 u32 attr_recursive
+    // +0x0c 8B lv2 sync names are 8 bytes, not 16
+    // +0x14 u32 reserved
+    // +0x18 u32 owner thread id 0xFFFFFFFF = never locked
+    // +0x1c u32 lock counter
+    // +0x20 u32 waiter count
+    // +0x24... u32 waiter ids
     //
     if (p.size() < 0x24) return std::nullopt;
     lwmutex_info info;
@@ -290,14 +340,14 @@ std::optional<lwmutex_info> parse_lwmutex_info(const response& r) {
 std::optional<cond_info> parse_cond_info(const response& r) {
     const auto p = payload_view(r);
     // layout:
-    //   +0x00 u32 handle
-    //   +0x04 u32 attr (shared bit)
-    //   +0x08 u64 key
-    //   +0x10 u32 flags
-    //   +0x14 8B  name (NUL-padded)
-    //   +0x1c u32 mutex id
-    //   +0x20 u32 wait count
-    //   +0x24 ...  u64 wait thread ids
+    // +0x00 u32 handle
+    // +0x04 u32 attr (shared bit)
+    // +0x08 u64 key
+    // +0x10 u32 flags
+    // +0x14 8B name (NUL-padded)
+    // +0x1c u32 mutex id
+    // +0x20 u32 wait count
+    // +0x24... u64 wait thread ids
     if (p.size() < 0x24) return std::nullopt;
     cond_info info;
     info.handle      = read_be_u32(p, 0x00);
@@ -318,15 +368,15 @@ std::optional<cond_info> parse_cond_info(const response& r) {
 std::optional<event_queue_info> parse_event_queue_info(const response& r) {
     const auto p = payload_view(r);
     // abcd0003 / get_sync_primitives. The name comes before the key, not after it
-    //   +0x00 u32 handle
-    //   +0x04 u32 attr_protocol
-    //   +0x08 u32 type
-    //   +0x0c 8B  name (NUL-padded)
-    //   +0x14 u64 key
-    //   +0x1c u32 queue size
-    //   +0x20 u32 queued count
-    //   +0x24 u32 wait count
-    //   +0x28 ...  u64 wait thread ids
+    // +0x00 u32 handle
+    // +0x04 u32 attr_protocol
+    // +0x08 u32 type
+    // +0x0c 8B name (NUL-padded)
+    // +0x14 u64 key
+    // +0x1c u32 queue size
+    // +0x20 u32 queued count
+    // +0x24 u32 wait count
+    // +0x28... u64 wait thread ids
     //
     if (p.size() < 0x28) return std::nullopt;
     event_queue_info info;
@@ -353,10 +403,10 @@ std::optional<std::vector<container_info>> parse_container_info(const response& 
     std::vector<container_info> out;
     out.reserve(count);
     // percontainer 16-byte layout:
-    //   +0x00 u32 total size of container? (bytes)
-    //   +0x04 u32 available size in container (bytes)
-    //   +0x08 u32 id
-    //   +0x0C u32 parent container ID (0xFFFFFFFF if no parent)
+    // +0x00 u32 total size of container? (bytes)
+    // +0x04 u32 available size in container (bytes)
+    // +0x08 u32 id
+    // +0x0C u32 parent container ID (0xFFFFFFFF if no parent)
     constexpr std::size_t entry_size = 16;
     for (std::uint32_t i = 0; i < count; ++i) {
         const std::size_t off = 4 + i * entry_size;

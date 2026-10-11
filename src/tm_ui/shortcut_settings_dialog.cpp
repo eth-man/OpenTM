@@ -41,9 +41,9 @@ void shortcut_settings_dialog::save(const QString& key, const QKeySequence& seq)
 
 void shortcut_settings_dialog::apply_saved(const QHash<QString, QAction*>& actions) {
     QSettings s;
-    for (auto it = actions.constBegin(); it != actions.constEnd(); ++it) {
+    for (auto it = actions.constBegin(); it!= actions.constEnd(); ++it) {
         const auto v = s.value(settings_key(it.key()));
-        if (!v.isValid()) continue;   // never rebound: keep the default
+        if (!v.isValid()) continue; // never rebound: keep the default
         it.value()->setShortcut(QKeySequence(v.toString(), QKeySequence::PortableText));
     }
 }
@@ -54,7 +54,7 @@ shortcut_settings_dialog::shortcut_settings_dialog(const QHash<QString, QAction*
     resize(560, 460);
 
     // captured before any edits so Reset has something to go back to
-    for (auto it = actions_.constBegin(); it != actions_.constEnd(); ++it) {
+    for (auto it = actions_.constBegin(); it!= actions_.constEnd(); ++it) {
         defaults_.insert(it.key(), it.value()->property("default_shortcut").value<QKeySequence>());
     }
 
@@ -131,7 +131,7 @@ QTreeWidgetItem* shortcut_settings_dialog::selected() const {
 QString shortcut_settings_dialog::conflict_for(const QKeySequence& seq, const QString& except_key) const
 {
     if (seq.isEmpty()) return {};
-    for (auto it = actions_.constBegin(); it != actions_.constEnd(); ++it) {
+    for (auto it = actions_.constBegin(); it!= actions_.constEnd(); ++it) {
         if (it.key() == except_key) continue;
         if (it.value()->shortcut() == seq) return clean_label(it.value());
     }
@@ -146,7 +146,7 @@ void shortcut_settings_dialog::assign_from_editor() {
     if (!a) return;
 
     const auto seq = editor_->keySequence();
-    if (const auto clash = conflict_for(seq, key); !clash.isEmpty()) {
+    if (const auto clash = conflict_for(seq, key);!clash.isEmpty()) {
         notice_->setText(tr("%1 is already used by \"%2\".").arg(seq.toString(QKeySequence::NativeText), clash));
         return;
     }

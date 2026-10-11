@@ -2,6 +2,7 @@
 
 #include "session_controller.h"
 #include "tsmp_helpers.h"
+#include "app_home_path.h"
 
 #include <tm_core/be_io.h>
 #include <tm_core/dbgshl_cmd.h>
@@ -126,6 +127,11 @@ void target_actions::reset_debug() {
 void target_actions::reset_ssm() {
     if (!require_ready(tr("Reset"))) return;
     send_reset_sequence(0x11, 0x11, tr("SSM"));
+}
+
+void target_actions::reset_release() {
+    if (!require_ready(tr("Reset"))) return;
+    send_reset_sequence(0x01, 0x11, tr("Release Mode"));
 }
 
 void target_actions::reset_current() {
@@ -265,14 +271,9 @@ void target_actions::send_load_executable(const QString& file, const load_option
     const QFileInfo fi(file);
     emit log_message(tr(">>> Load Executable: %1 (%2 bytes)").arg(file).arg(fi.size()));
 
-    QString wire_path;
-    const bool kit_side = file.startsWith(QStringLiteral("/app_home/")) || file.startsWith(QStringLiteral("/dev_")) || file.startsWith(QStringLiteral("/host_root/"));
-    if (kit_side) {
-        wire_path = file;
-    } else {
-        wire_path = QStringLiteral("/app_home/") + QFileInfo(file).fileName();
+    const QString wire_path = opentm::tm_session::host_to_app_home_path(file);
+    if (wire_path != file)
         emit log_message(tr("    .. host path rewritten to %1").arg(wire_path));
-    }
 
     using namespace opentm::tm_core;
 
@@ -343,13 +344,13 @@ void target_actions::send_load_executable(const QString& file, const load_option
     if (opts.rsx_profiling_tool)    d3 |= 0x1ull;
     if (opts.high_memory_footprint) d3 |= 0x2ull;
 
-    append_be_u64(body, 0);                                   // version
-    append_be_u64(body, opts.enable_extra_options ? d0 : 0);  // data[0]
-    append_be_u64(body, opts.enable_extra_options ? 1 : 0);   // data[1]
+    append_be_u64(body, 0); // version
+    append_be_u64(body, opts.enable_extra_options ? d0 : 0); // data[0]
+    append_be_u64(body, opts.enable_extra_options ? 1 : 0); // data[1]
     append_be_u64(body, opts.core_dump ? opts.core_dump_location : 0); // data[2]
-    append_be_u64(body, d3);                                  // data[3]
-    append_be_u64(body, opts.gcm_capture_mode ? 1 : 0);       // data[4]
-    for (int i = 5; i <= 15; ++i) append_be_u64(body, 0);     // data[5..15]
+    append_be_u64(body, d3); // data[3]
+    append_be_u64(body, opts.gcm_capture_mode ? 1 : 0); // data[4]
+    for (int i = 5; i <= 15; ++i) append_be_u64(body, 0); // data[5..15]
 
     emit log_message(tr("    -- LOAD_EXT debug_flags=0x%1 (debug=%2 ppu_dis=%3 spu_dis=%4)"" argc=%5 envc=%6").arg(debug_flags, 8, 16, QChar('0')).arg(opts.enable_debug_module ? 1 : 0).arg(opts.disable_ppu_debug ? 1 : 0).arg(opts.disable_spu_debug ? 1 : 0).arg(argv.size()).arg(envv.size()));
 
@@ -369,7 +370,11 @@ opentm::tm_core::deci3_frame target_actions::build_dbgshl(
 
 void target_actions::install_package(const QString& host_path) {
     if (!require_ready(tr("Install package"))) return;
-    const QString wire_path = QStringLiteral("/app_home/") + QDir::toNativeSeparators(host_path);
+    // Same path rule as send_load_executable, via the shared mapper (app_home_path.h): a host
+    // path is served as /app_home/<basename>. The old code sent /app_home/ + the raw
+    // (native-separator) host path -> malformed /app_home/<full path> -> console ENOENT (the
+    // identical bug class as ProDG's loader path).
+    const QString wire_path = opentm::tm_session::host_to_app_home_path(host_path);
 
     QByteArray body = wire_path.toLatin1();
     body.append('\0');
@@ -399,15 +404,15 @@ void target_actions::send_settings_apply(const QString& host_path, std::uint32_t
     body.reserve(0x860);
     auto be32 = [&body](std::uint32_t v) { opentm::tm_core::append_be_u32(body, v); };
     const std::uint32_t id = transfer_id_++;
-    be32(0x00000012u);                      // +0x00 param_c = transfer
-    be32(id);                               // +0x04 transfer id (TM: 2,3,4...)
-    be32(0);                                // +0x08
-    be32(0);                                // +0x0C
+    be32(0x00000012u); // +0x00 param_c = transfer
+    be32(id); // +0x04 transfer id (TM: 2,3,4...)
+    be32(0); // +0x08
+    be32(0); // +0x0C
     be32(static_cast<std::uint32_t>(
-             QDateTime::currentSecsSinceEpoch() & 0xffffffffu));  // +0x10
-    be32(0);                                // +0x14
-    be32(file_size);                        // +0x18 source size in bytes
-    be32(id);                               // +0x1C mirrors the id
+             QDateTime::currentSecsSinceEpoch() & 0xffffffffu)); // +0x10
+    be32(0); // +0x14
+    be32(file_size); // +0x18 source size in bytes
+    be32(id); // +0x1C mirrors the id
     QString rel = host_path;
     if (!target_.file_server_dir.isEmpty()) {
         const QDir root(target_.file_server_dir);

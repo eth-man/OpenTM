@@ -1,19 +1,19 @@
 //
 // layout layout, all multi byte integers are BE:
 //
-//   offset size  field
-//   0      2     magic         always 0x3010
-//   2      4     session_a     zero early in a stream and carries a session id later
-//   6      2     length        total frame size in bytes, including this header
-//   8      2     dir_marker    ascii pair (in direction enum)
-//   10     4     session_b     zero or scope/handle id
-//   14     2     category      sub-protocol code
-//   16     N     payload       opaque bytes (handed to inner codecs)
+// offset size field
+// 0 2 magic always 0x3010
+// 2 4 session_a zero early in a stream and carries a session id later
+// 6 2 length total frame size in bytes, including this header
+// 8 2 dir_marker ascii pair (in direction enum)
+// 10 4 session_b zero or scope/handle id
+// 14 2 category sub-protocol code
+// 16 N payload opaque bytes (handed to inner codecs)
 //
 // sub protocol families are picked by the direction marker bytes:
-//   "HM"/"MH"  netmp          DECR control family
-//   "HT"/"TH"  dfmp           shared file/management family
-//   "MT"/"TM"  netmp_cfw      CFW target control family
+// "HM"/"MH" netmp DECR control family
+// "HT"/"TH" dfmp shared file/management family
+// "MT"/"TM" netmp_cfw CFW target control family
 
 #pragma once
 

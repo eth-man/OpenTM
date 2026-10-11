@@ -39,6 +39,7 @@ public:
     void power_off() override       { when_ready([this] { user_disconnected_ = true; actions_.power_off(); }); }
     void power_off_force() override { when_ready([this] { user_disconnected_ = true; actions_.power_off_force(); }); }
     void reset_current() override   { when_ready([this] { actions_.reset_current(); }); }
+    void reset_release()            { when_ready([this] { actions_.reset_release(); }); }
     void wake_on_lan() override     { actions_.wake_on_lan(); }
 
     void load_executable(const QString& path, const load_options& o) override {
@@ -84,6 +85,16 @@ public:
 
     void refresh_lpar_status() override             { actions_.request_lpar_status(); }
     void refresh_process_list() override            { kernel_.refresh_process_list(); }
+    void attach_process(std::uint32_t pid) { kernel_.attach_process(pid); }
+    void read_memory(std::uint32_t pid, std::uint64_t addr, std::uint32_t size) { kernel_.read_memory(pid, addr, size); }
+    void read_ppu_registers(std::uint32_t pid, std::uint64_t tid) { kernel_.read_ppu_registers(pid, tid); }
+    void read_spu_registers(std::uint32_t pid, std::uint64_t tid) { kernel_.read_spu_registers(pid, tid); }
+    void read_spu_local_store(std::uint32_t pid, std::uint64_t tid, std::uint32_t offset, std::uint32_t size) { kernel_.read_spu_local_store(pid, tid, offset, size); }
+    void set_data_watchpoint(std::uint32_t pid, std::uint64_t addr, std::uint64_t ctrl) { kernel_.set_data_watchpoint(pid, addr, ctrl); }
+    void get_data_watchpoint(std::uint32_t pid) { kernel_.get_data_watchpoint(pid); }
+    void set_breakpoint(std::uint32_t pid, std::uint64_t tid, std::uint64_t addr, bool spu) { kernel_.set_breakpoint(pid, tid, addr, spu); }
+    void clear_breakpoint(std::uint32_t pid, std::uint64_t tid, std::uint64_t addr, bool spu) { kernel_.clear_breakpoint(pid, tid, addr, spu); }
+    void list_breakpoints(std::uint32_t pid, bool spu) { kernel_.list_breakpoints(pid, spu); }
     void refresh_threads(std::uint32_t pid) override      { kernel_.refresh_threads(pid); }
     void refresh_modules(std::uint32_t pid) override      { kernel_.refresh_modules(pid); }
     void refresh_mutexes(std::uint32_t pid) override      { kernel_.refresh_mutexes(pid); }

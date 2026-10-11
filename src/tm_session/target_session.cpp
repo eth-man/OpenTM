@@ -73,6 +73,7 @@ void target_session::wire() {
         emit protocol_rejected(proto, name, status);
     });
     connect(&explorer_, &file_explorer_controller::file_op_finished, this, &session_api::file_op_finished);
+    connect(&disp_,     &frame_dispatcher::protocol_registered,   this, &session_api::protocol_registered);
     connect(&disp_,     &frame_dispatcher::frame_logged,          this, &session_api::wire_line);
     connect(&disp_,     &frame_dispatcher::tty_text,              this, &session_api::tty_text);
     connect(&session_,  &session_controller::log_message,         this, &session_api::log_message);
@@ -150,6 +151,7 @@ void target_session::wire() {
         }
     });
     connect(&disp_, &frame_dispatcher::load_ext_reply,    this, &session_api::load_ext_reply);
+    connect(&disp_, &frame_dispatcher::load_ext_pid,      this, &session_api::load_ext_pid);
     connect(&disp_, &frame_dispatcher::install_progress,  this, &session_api::install_progress);
     connect(&disp_, &frame_dispatcher::install_finished,  this, &session_api::install_finished);
     connect(&disp_, &frame_dispatcher::install_reply,     this, &session_api::install_reply);
@@ -163,6 +165,18 @@ void target_session::wire() {
     connect(&kernel_, &kernel_explorer_controller::conds_ready,        this, &session_api::conds_ready);
     connect(&kernel_, &kernel_explorer_controller::event_queues_ready, this, &session_api::event_queues_ready);
     connect(&kernel_, &kernel_explorer_controller::containers_ready,   this, &session_api::containers_ready);
+    connect(&kernel_, &kernel_explorer_controller::memory_read_ready,  this, &session_api::memory_read_ready);
+    connect(&kernel_, &kernel_explorer_controller::memory_read_failed, this, &session_api::memory_read_failed);
+    connect(&kernel_, &kernel_explorer_controller::ppu_regs_ready,  this, &session_api::ppu_regs_ready);
+    connect(&kernel_, &kernel_explorer_controller::ppu_regs_failed, this, &session_api::ppu_regs_failed);
+    connect(&kernel_, &kernel_explorer_controller::spu_regs_ready,  this, &session_api::spu_regs_ready);
+    connect(&kernel_, &kernel_explorer_controller::spu_regs_failed, this, &session_api::spu_regs_failed);
+    connect(&kernel_, &kernel_explorer_controller::spu_ls_ready,    this, &session_api::spu_ls_ready);
+    connect(&kernel_, &kernel_explorer_controller::spu_ls_failed,   this, &session_api::spu_ls_failed);
+    connect(&kernel_, &kernel_explorer_controller::watchpoint_set_done, this, &session_api::watchpoint_set_done);
+    connect(&kernel_, &kernel_explorer_controller::watchpoint_info,     this, &session_api::watchpoint_info);
+    connect(&kernel_, &kernel_explorer_controller::breakpoint_done,     this, &session_api::breakpoint_done);
+    connect(&kernel_, &kernel_explorer_controller::breakpoints_listed,  this, &session_api::breakpoints_listed);
     connect(&kernel_, &kernel_explorer_controller::process_list_ready, this,
             [this](QList<kernel_explorer_controller::process_summary> ps) {
         QList<session_api::process_summary> out;

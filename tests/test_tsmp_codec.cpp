@@ -49,10 +49,10 @@ TEST_CASE("TSMP system control command map", "[tsmp]") {
 
     CHECK(status    == 0x2000);
     CHECK(power_on  == 0x2002);
-    CHECK(power_off == 0x2004);   // forced terminate
-    CHECK(reset     == 0x2006);   // forced reboot
-    CHECK(shutdown  == 0x2008);   // graceful
-    CHECK(reboot    == 0x200A);   // graceful
+    CHECK(power_off == 0x2004); // forced terminate
+    CHECK(reset     == 0x2006); // forced reboot
+    CHECK(shutdown  == 0x2008); // graceful
+    CHECK(reboot    == 0x200A); // graceful
 
     SECTION("requests are even and replies are request+1") {
         for (auto cmd : {status, power_on, power_off, reset, shutdown, reboot}) {
@@ -91,20 +91,20 @@ TEST_CASE("LPAR status reply parses into 32-byte entries", "[tsmp]") {
     };
 
     // body = everything after the 6-byte header
-    std::vector<std::byte> body(6, std::byte{0});          // key + result
+    std::vector<std::byte> body(6, std::byte{0}); // key + result
     // the three a DECR-1000A actually reports
     for (const auto& e : {make_entry("PS3_LPAR", 2, 0x1f600000), make_entry("PS2_SW_LPAR", 0, 0x1f600000), make_entry("PS2_NE_LPAR", 0, 0)}) {
         body.insert(body.end(), e.begin(), e.end());
     }
-    REQUIRE(body.size() + tsmp_header_size == 108);        // matches the wire
+    REQUIRE(body.size() + tsmp_header_size == 108); // matches the wire
 
     const auto entries = parse_lpar_status_reply(body);
     REQUIRE(entries.size() == 3);
     CHECK(entries[0].name   == "PS3_LPAR");
     CHECK(entries[0].status == tsmp_lpar_state::up);
     CHECK(entries[0].detail == 0x1f600000);
-    CHECK(entries[1].name   == "PS2_SW_LPAR");     // PS2 software emulation
-    CHECK(entries[2].name   == "PS2_NE_LPAR");     // PS2 native EE/GS
+    CHECK(entries[1].name   == "PS2_SW_LPAR"); // PS2 software emulation
+    CHECK(entries[2].name   == "PS2_NE_LPAR"); // PS2 native EE/GS
     CHECK(entries[2].status == tsmp_lpar_state::down);
 
     CHECK(std::string(tsmp_lpar_state_name(tsmp_lpar_state::down))    == "down");
@@ -114,7 +114,7 @@ TEST_CASE("LPAR status reply parses into 32-byte entries", "[tsmp]") {
 
     SECTION("a name filling all 16 bytes is not over-read") {
         std::vector<std::byte> b(6, std::byte{0});
-        auto e = make_entry("ABCDEFGHIJKLMNOP", 7, 8);     // exactly 16, no nul
+        auto e = make_entry("ABCDEFGHIJKLMNOP", 7, 8); // exactly 16, no nul
         b.insert(b.end(), e.begin(), e.end());
         const auto got = parse_lpar_status_reply(b);
         REQUIRE(got.size() == 1);

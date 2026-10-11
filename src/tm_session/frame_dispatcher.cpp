@@ -4,6 +4,7 @@
 
 #include <tm_core/be_io.h>
 #include <tm_core/dcmp_codec.h>
+#include <tm_core/regist_codec.h>
 #include <tm_core/dbgshl_cmd.h>
 #include <tm_core/tty_stream.h>
 #include <tm_core/dfmp_codec.h>
@@ -32,10 +33,10 @@ void frame_dispatcher::on_frame_received(opentm::tm_core::deci3_frame f) {
         }
         emit frame_logged(QStringLiteral("    >> %1 cat=0x%2 sa=0x%3 sb=0x%4 payload(%5B)=%6").arg(QString::fromUtf8(direction_name(f.direction).data())).arg(f.category, 4, 16, QChar('0')).arg(f.session_a, 8, 16, QChar('0')).arg(f.session_b, 8, 16, QChar('0')).arg(f.payload.size()).arg(QString::fromLatin1(hex)));
     }
-    //   [0]   0x05         NETMP_CODE_REGISTER_REPLY
-    //   [1]   status       0=OK, !0=NACK
-    //   [2-3] echo arg     (priority/port on OK; zeros on NACK)
-    //   [4-7] proto BE u32 (which protocol the register was for)
+    // [0] 0x05 NETMP_CODE_REGISTER_REPLY
+    // [1] status 0=OK,!0=NACK
+    // [2-3] echo arg (priority/port on OK; zeros on NACK)
+    // [4-7] proto BE u32 (which protocol the register was for)
     if (f.direction == deci3_direction::machine_to_host
         && f.category == 0x0010
         && f.payload.size() >= 8
@@ -45,6 +46,23 @@ void frame_dispatcher::on_frame_received(opentm::tm_core::deci3_frame f) {
         if (status != 0) {
             emit netmp_register_nack(status, be_u32_at(f.payload, 4));
         }
+    }
+
+    // Target register-ACK (direct/CFW profile): 02 01 <port> <pad> <proto:u32 BE> <lpar...>.
+    // Each registration is confirmed individually; there is no aggregate list reply on a
+    // direct-to-target connection, so this per-ACK stream IS the registered-protocol list.
+    if ((f.direction == deci3_direction::target_to_host
+         || f.direction == deci3_direction::machine_to_host)
+        && f.category == 0x0001
+        && f.payload.size() >= 8
+        && std::to_integer<std::uint8_t>(f.payload[0]) == 0x02
+        && std::to_integer<std::uint8_t>(f.payload[1]) == 0x01)
+    {
+        std::vector<std::uint8_t> bytes(f.payload.size());
+        for (std::size_t i = 0; i < f.payload.size(); ++i)
+            bytes[i] = std::to_integer<std::uint8_t>(f.payload[i]);
+        if (auto r = opentm::tm_core::regist::parse_register_ack(bytes.data(), bytes.size()))
+            emit protocol_registered(r->port, r->proto, QString::fromStdString(r->lpar));
     }
 
     if (f.direction == deci3_direction::machine_to_host && f.category == 0x0010 && f.payload.size() >= 2 && std::to_integer<std::uint8_t>(f.payload[0]) == 0x11 && std::to_integer<std::uint8_t>(f.payload[1]) == 0x00)
@@ -123,8 +141,8 @@ void frame_dispatcher::on_frame_received(opentm::tm_core::deci3_frame f) {
     }
 
     // DELETE_PROTO (type=0x02 code=0x02): a protocol registration went away
-    //   payload[2..3]  session id LE u16
-    //   payload[6..7]  category BE u16    0x0020 = tsmp router
+    // payload[2..3] session id LE u16
+    // payload[6..7] category BE u16 0x0020 = tsmp router
     if (f.category == 0x0001 && f.payload.size() >= 4 && std::to_integer<std::uint8_t>(f.payload[0]) == dcmp::type::status && std::to_integer<std::uint8_t>(f.payload[1]) == dcmp::status_code::delete_proto)
     {
         const std::uint16_t notified = static_cast<std::uint16_t>(std::to_integer<std::uint8_t>(f.payload[2])) | (static_cast<std::uint16_t>(std::to_integer<std::uint8_t>(f.payload[3])) << 8);
@@ -164,6 +182,10 @@ void frame_dispatcher::on_frame_received(opentm::tm_core::deci3_frame f) {
 
     if (f.category == 0x0200 && f.payload.size() >= 20 && be_u32_at(f.payload, 0) == 0x80000004u)
     {
+        // a successful spawn carries the new pid as a 4-byte reply payload;
+        // emit it before the status so a listener has the pid when the reply fires.
+        if (f.payload.size() >= 24 && be_u32_at(f.payload, 16) == 0 && be_u32_at(f.payload, 8) >= 4)
+            emit load_ext_pid(be_u32_at(f.payload, 20));
         emit load_ext_reply(be_u32_at(f.payload, 16));
     }
 
@@ -178,7 +200,7 @@ void frame_dispatcher::on_frame_received(opentm::tm_core::deci3_frame f) {
 
         const std::uint32_t marker = take >= 8 ? be_u32_at(f.payload, dfmp_header_size + 4) : 0;
 
-        // 0x11 acks the transfer request (result != 0 means it was refused) 
+        // 0x11 acks the transfer request (result!= 0 means it was refused)
         // 0x13 arrives afterwards, unsolicited, when the copy has finished
         if (marker == 0x11 && take >= 16) {
             emit transfer_acked(seq, be_u32_at(f.payload, dfmp_header_size + 12));

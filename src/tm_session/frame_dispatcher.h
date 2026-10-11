@@ -37,6 +37,7 @@ signals:
     void lpar_status_received(std::vector<opentm::tm_core::tsmp_lpar_entry> entries);
     void server_rejection(std::uint8_t kind);
     void netmp_register_nack(std::uint8_t status, std::uint32_t proto);
+    void protocol_registered(std::uint8_t port, std::uint32_t proto, QString lpar);
     void debug_agent_up();
     void boot_param_received(quint64 value, bool in_effect);
     void power_reply(quint16 cmd, quint32 result);
@@ -44,6 +45,7 @@ signals:
     void install_finished(QString installed_path);
     void install_reply(std::uint32_t lv2_status);
     void load_ext_reply(std::uint32_t lv2_status);
+    void load_ext_pid(std::uint32_t pid);
     void dfmp_get_entries_reply(std::uint32_t seq, QByteArray body);
     void dfmp_op_reply(std::uint32_t seq, std::uint32_t marker, std::uint32_t status);
     void tty_text(QString text);

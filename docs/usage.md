@@ -86,7 +86,7 @@ A load that the console rejects exits 4, not 0. That is the difference between a
 them in, so one invocation can create a directory, upload into it and list the
 result.
 
-Power control does not need a debug session, the communications processor (DECR-1000 only) answers with the console off - so `--power-on --wait-agent --load ...` works from cold.
+Power control does not need a debug session, the communications processor (DECR-1000 only) answers with the console off - so `--power-on --wait-agent --load...` works from cold.
 
 ### Two traps
 

@@ -32,6 +32,7 @@ public slots:
     void power_off_force();
     void reset_debug();
     void reset_ssm();
+    void reset_release();
     void reset_current();
     void wake_on_lan();
     void send_load_executable(const QString& path, const load_options& opts);

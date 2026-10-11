@@ -10,6 +10,12 @@ add_library(tm_core STATIC
     drfp_codec.h
     dbgp_codec.cpp
     dbgp_codec.h
+    lv1_guard.cpp
+    lv1_guard.h
+    nor_image.cpp
+    nor_image.h
+    ps3mapi_client.cpp
+    ps3mapi_client.h
     tsmp_codec.cpp
     sft_settings.cpp
     sft_schema.cpp

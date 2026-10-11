@@ -23,7 +23,7 @@ public:
 
     virtual void set_target(const target_record& r) = 0;
     virtual void clear_target() = 0;
-    virtual const target_record& target() const = 0;    
+    virtual const target_record& target() const = 0;
     virtual void set_file_serving_dir(const QString& dir) = 0;
     virtual void set_auto_reconnect(bool /*on*/) {}
     virtual void connect_to_target() = 0;
@@ -32,7 +32,7 @@ public:
     virtual void close_target() { disconnect_from_target(); }
     virtual bool is_connected() const = 0;
     virtual bool is_session_ready() const = 0;
-    virtual QString peer_summary() const = 0;        
+    virtual QString peer_summary() const = 0;
     virtual opentm::tm_core::tcp_connection::state connection_state() const = 0;
     virtual void power_on() = 0;
     virtual void power_off() = 0;
@@ -90,10 +90,23 @@ signals:
     // a protocol the kit refused to register on this connection, usually
     // because another target manager still owns it
     void protocol_rejected(quint32 proto, QString name, quint8 status);
+    void protocol_registered(quint8 port, quint32 proto, QString lpar);
     void sdk_version_received(QString sdk);
     void cp_version_received(QString cp);
     void directory_listed(QString path, std::vector<opentm::tm_core::dfmp_file_entry> entries);
     void process_list_ready(QList<process_summary> processes);
+    void memory_read_ready(std::uint64_t addr, QByteArray data);
+    void memory_read_failed(std::uint64_t addr, std::uint32_t result);
+    void ppu_regs_ready(std::uint64_t tid, QByteArray data);
+    void ppu_regs_failed(std::uint64_t tid, std::uint32_t result);
+    void spu_regs_ready(std::uint64_t tid, QByteArray data);
+    void spu_regs_failed(std::uint64_t tid, std::uint32_t result);
+    void spu_ls_ready(std::uint64_t offset, QByteArray data);
+    void spu_ls_failed(std::uint64_t offset, std::uint32_t result);
+    void watchpoint_set_done(std::uint32_t result);
+    void watchpoint_info(std::uint64_t addr, std::uint64_t ctrl, std::uint32_t result);
+    void breakpoint_done(std::uint64_t addr, std::uint32_t result);
+    void breakpoints_listed(QByteArray raw, std::uint32_t result);
     void threads_ready(std::uint32_t pid, QList<opentm::tm_core::dbgp::ppu_thread_info> items);
     void modules_ready(std::uint32_t pid, QList<opentm::tm_core::dbgp::prx_info> items);
     void mutexes_ready(std::uint32_t pid, QList<opentm::tm_core::dbgp::mutex_info> items);
@@ -102,6 +115,7 @@ signals:
     void event_queues_ready(std::uint32_t pid, QList<opentm::tm_core::dbgp::event_queue_info> items);
     void containers_ready(std::uint32_t pid, QList<opentm::tm_core::dbgp::container_info> items);
     void load_ext_reply(std::uint32_t lv2_status);
+    void load_ext_pid(std::uint32_t pid);
     void install_progress(int percent);
     void install_finished(QString installed_path);
     void install_reply(std::uint32_t lv2_status);
