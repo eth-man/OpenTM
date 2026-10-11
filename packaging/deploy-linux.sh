@@ -14,13 +14,13 @@ JOBS="$(command -v nproc >/dev/null 2>&1 && nproc || echo 4)"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --no-appimage) WANT_APPIMAGE=0; shift ;;
-        --no-tarball)  WANT_TARBALL=0;  shift ;;
-        --version)     VERSION="$2";    shift 2 ;;
-        --jobs)        JOBS="$2";       shift 2 ;;
-        --build-root)  BUILD_ROOT="$2"; shift 2 ;;
-        --dist)        DIST="$2";       shift 2 ;;
-        *) echo "deploy-linux.sh: unknown argument: $1" >&2; exit 2 ;;
+        --no-appimage) WANT_APPIMAGE=0; shift;;
+        --no-tarball) WANT_TARBALL=0; shift;;
+        --version) VERSION="$2"; shift 2;;
+        --jobs) JOBS="$2"; shift 2;;
+        --build-root) BUILD_ROOT="$2"; shift 2;;
+        --dist) DIST="$2"; shift 2;;
+        *) echo "deploy-linux.sh: unknown argument: $1" >&2; exit 2;;
     esac
 done
 
@@ -151,7 +151,7 @@ if [[ "$WANT_APPIMAGE" == "1" ]]; then
 fi
 
 echo "[deploy] writing checksums"
-( cd "$DIST" && sha256sum ./*.tar.gz ./*.AppImage 2>/dev/null > SHA256SUMS ) || true
+( cd "$DIST" && sha256sum ./*.tar.gz./*.AppImage 2>/dev/null > SHA256SUMS ) || true
 
 echo "[deploy] done:"
 ls -lh "$DIST"

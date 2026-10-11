@@ -23,7 +23,7 @@ public:
 
     virtual void set_target(const target_record& r) = 0;
     virtual void clear_target() = 0;
-    virtual const target_record& target() const = 0;    
+    virtual const target_record& target() const = 0;
     virtual void set_file_serving_dir(const QString& dir) = 0;
     virtual void set_auto_reconnect(bool /*on*/) {}
     virtual void connect_to_target() = 0;
@@ -32,7 +32,7 @@ public:
     virtual void close_target() { disconnect_from_target(); }
     virtual bool is_connected() const = 0;
     virtual bool is_session_ready() const = 0;
-    virtual QString peer_summary() const = 0;        
+    virtual QString peer_summary() const = 0;
     virtual opentm::tm_core::tcp_connection::state connection_state() const = 0;
     virtual void power_on() = 0;
     virtual void power_off() = 0;

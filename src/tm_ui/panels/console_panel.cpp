@@ -124,7 +124,7 @@ void console_panel::append_stream(std::uint8_t stream, const QString& text) {
 
 void console_panel::append_stream_at(std::uint8_t stream, const QString& text, const QDateTime& when) {
     const auto it = routes_.constFind(stream);
-    if (it == routes_.constEnd()) return;   // nothing listening
+    if (it == routes_.constEnd()) return; // nothing listening
     for (int idx : *it) append_to(idx, text, when);
 }
 

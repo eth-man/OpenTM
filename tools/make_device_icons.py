@@ -7,10 +7,10 @@ SOURCE = ICONS / "drive.bmp"
 
 TINTS = {
     "drive_usb":   (205, 0.85),   # blue
-    "drive_ms":    (280, 0.70),   # violet   - Memory Stick / Duo
-    "drive_sd":    (115, 0.70),   # green    - SD / SDHC
-    "drive_cf":    (28,  0.85),   # orange   - CompactFlash
-    "drive_flash": (0,   0.75),   # red      - internal /dev_flash*
+    "drive_ms":    (280, 0.70),   # violet - Memory Stick / Duo
+    "drive_sd":    (115, 0.70),   # green - SD / SDHC
+    "drive_cf":    (28,  0.85),   # orange - CompactFlash
+    "drive_flash": (0,   0.75),   # red - internal /dev_flash*
 }
 
 

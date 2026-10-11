@@ -1,6 +1,6 @@
-// socket 0  control  cat=0x0001 / 0x0010 / 0x0020 / 0x0200
-// socket 1  TTY      cat=0x0300 (kit -> host only)
-// socket 2  DRFP     cat=0x0110 (host file serving for /app_home/)
+// socket 0 control cat=0x0001 / 0x0010 / 0x0020 / 0x0200
+// socket 1 TTY cat=0x0300 (kit -> host only)
+// socket 2 DRFP cat=0x0110 (host file serving for /app_home/)
 
 #pragma once
 

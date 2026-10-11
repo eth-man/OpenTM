@@ -1,5 +1,7 @@
 #include "target_session.h"
 
+#include <tm_core/netmp_codec.h>
+
 #include <QTimer>
 
 #include <QDir>
@@ -54,6 +56,11 @@ void target_session::wire() {
     connect(&disp_, &frame_dispatcher::dfmp_get_entries_reply,    &explorer_, &file_explorer_controller::on_dfmp_get_entries_reply);
     connect(&disp_, &frame_dispatcher::dfmp_op_reply,             &explorer_, &file_explorer_controller::on_dfmp_op_reply);
     connect(&disp_, &frame_dispatcher::netmp_register_nack, this, [this](std::uint8_t status, std::uint32_t proto) {
+        // Protocol number -> short name, for logging a registration refusal.
+        // Note: 0x00000310 is the controller record/playback protocol, NOT console
+        // TTY (console text is 0x00800300, "TTY" below). The "TTYP" name is kept for
+        // now only to avoid colliding with the "CTRLP" label on 0x00800011, whose
+        // own identity is not yet confirmed.
         static const struct { std::uint32_t proto; const char* name; } kNames[] = {
             {0x00000200u, "DBGP"}, {0x00000100u, "DFMP"}, {0x00000110u, "DRFP"},
             {0x00000310u, "TTYP"}, {0x00800011u, "CTRLP"}, {0x00000020u, "CP"},
@@ -63,11 +70,13 @@ void target_session::wire() {
         for (const auto& n : kNames) {
             if (n.proto == proto) { name = QLatin1String(n.name); break; }
         }
-        // 0x0c is this connection asking twice for something it already has;
-        // anything else means the kit will not give it to us
-        const bool already_ours = status == 0x0c;
-        emit log_message(QStringLiteral("       !! %1 registration refused (status 0x%2)%3")
-                             .arg(name).arg(status, 2, 16, QChar('0'))
+        // Decode the NACK status to its NETMP reason name. ALREADY_REGISTER means this
+        // connection asked twice for something it already has (benign); anything else
+        // means the kit will not give it to us.
+        const bool already_ours = opentm::tm_core::netmp::status_is_already_registered(status);
+        const char* reason = opentm::tm_core::netmp::status_name(status);
+        emit log_message(QStringLiteral("       !! %1 registration refused (%2, status 0x%3)%4")
+                             .arg(name).arg(QLatin1String(reason)).arg(status, 2, 16, QChar('0'))
                              .arg(already_ours ? QStringLiteral(" - this connection already holds it")
                                                : QStringLiteral(" - another connection still owns it")));
         emit protocol_rejected(proto, name, status);

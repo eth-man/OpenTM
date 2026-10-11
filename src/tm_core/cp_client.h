@@ -11,14 +11,14 @@ class QNetworkAccessManager;
 namespace opentm::tm_core {
 
 struct cp_boot_params {
-    QString boot_mode      = QStringLiteral("dbg");        // dbg|sys|rel
-    QString memory_size    = QStringLiteral("tool");       // tool|console
-    QString bd_access      = QStringLiteral("drive");      // emu_dev|emu_usb|drive
-    QString hdd_speed      = QStringLiteral("native");     // native|emulated
-    QString release_check  = QStringLiteral("dev");        // dev|rel
-    QString hostfs         = QStringLiteral("dev");        // dev|target
-    QString model          = QStringLiteral("ps3-hdd60");  // ps3-hdd60|ps3-hdd20
-    QString boot_beep      = QStringLiteral("silent");     // beep|silent
+    QString boot_mode      = QStringLiteral("dbg"); // dbg|sys|rel
+    QString memory_size    = QStringLiteral("tool"); // tool|console
+    QString bd_access      = QStringLiteral("drive"); // emu_dev|emu_usb|drive
+    QString hdd_speed      = QStringLiteral("native"); // native|emulated
+    QString release_check  = QStringLiteral("dev"); // dev|rel
+    QString hostfs         = QStringLiteral("dev"); // dev|target
+    QString model          = QStringLiteral("ps3-hdd60"); // ps3-hdd60|ps3-hdd20
+    QString boot_beep      = QStringLiteral("silent"); // beep|silent
 
     bool operator==(const cp_boot_params&) const = default;
 };

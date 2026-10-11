@@ -140,8 +140,8 @@ inline constexpr std::uint32_t filetrace_start         = 0x80000710u;
 
 //unsolicited target->host notifications.
 //
-//   header:  [ucmd][seq 0][data_len][source]
-//   data:    [status][event][event specific payload...]
+// header: [ucmd][seq 0][data_len][source]
+// data: [status][event][event specific payload...]
 namespace notify {
 
 inline constexpr std::uint32_t ucmd = 0x80000b00u;

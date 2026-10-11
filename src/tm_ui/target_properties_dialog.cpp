@@ -42,10 +42,10 @@ std::uint32_t stack_kb_to_bytes(int kb) {
 
 int dump_loc_to_index(std::uint64_t v) {
     switch (v) {
-    case 0x1: return 1;  // /dev_ms
-    case 0x4: return 2;  // /dev_usb
-    case 0x8: return 3;  // /dev_hdd0
-    default:  return 0;  // /app_home (0x2)
+    case 0x1: return 1; // /dev_ms
+    case 0x4: return 2; // /dev_usb
+    case 0x8: return 3; // /dev_hdd0
+    default:  return 0; // /app_home (0x2)
     }
 }
 std::uint64_t index_to_dump_loc(int i) {
@@ -77,9 +77,9 @@ target_properties_dialog::target_properties_dialog(const target_record& r, QWidg
     auto* type_root   = new QTreeWidgetItem(nav_, {tr("Target Type")});
     auto* timeouts    = new QTreeWidgetItem(type_root, {tr("Time-outs")});
 
-    pages_->addWidget(build_tm_properties_page());   // 0
-    pages_->addWidget(build_xmb_page());             // 1
-    pages_->addWidget(build_timeouts_page());        // 2
+    pages_->addWidget(build_tm_properties_page()); // 0
+    pages_->addWidget(build_xmb_page()); // 1
+    pages_->addWidget(build_timeouts_page()); // 2
     tm_props->setData(0, Qt::UserRole, 0);
     xmb     ->setData(0, Qt::UserRole, 1);
     timeouts->setData(0, Qt::UserRole, 2);
@@ -387,7 +387,7 @@ void target_properties_dialog::reload_xmb() {
     int keys = 0, unknown = 0;
 
     for (const auto& s : xmb_baseline_.sections()) {
-        if (s.name == QLatin1String("Version")) continue;   // structural
+        if (s.name == QLatin1String("Version")) continue; // structural
         for (const auto& e : s.entries) {
             const auto d = opentm::tm_core::describe(s.name, e.key);
             if (d.group == QLatin1String("Other")) ++unknown;

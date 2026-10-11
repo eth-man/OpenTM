@@ -37,7 +37,7 @@ std::vector<tsmp_lpar_entry> parse_lpar_status_reply(std::span<const std::byte> 
     if (body.size() < skip) return out;
 
     const std::size_t payload = body.size() - skip;
-    if (payload % tsmp_lpar_entry_size != 0) return out;   // partial entry
+    if (payload % tsmp_lpar_entry_size != 0) return out; // partial entry
 
     out.reserve(payload / tsmp_lpar_entry_size);
     for (std::size_t off = skip; off + tsmp_lpar_entry_size <= body.size();

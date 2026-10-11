@@ -32,10 +32,10 @@ void frame_dispatcher::on_frame_received(opentm::tm_core::deci3_frame f) {
         }
         emit frame_logged(QStringLiteral("    >> %1 cat=0x%2 sa=0x%3 sb=0x%4 payload(%5B)=%6").arg(QString::fromUtf8(direction_name(f.direction).data())).arg(f.category, 4, 16, QChar('0')).arg(f.session_a, 8, 16, QChar('0')).arg(f.session_b, 8, 16, QChar('0')).arg(f.payload.size()).arg(QString::fromLatin1(hex)));
     }
-    //   [0]   0x05         NETMP_CODE_REGISTER_REPLY
-    //   [1]   status       0=OK, !0=NACK
-    //   [2-3] echo arg     (priority/port on OK; zeros on NACK)
-    //   [4-7] proto BE u32 (which protocol the register was for)
+    // [0] 0x05 NETMP_CODE_REGISTER_REPLY
+    // [1] status 0=OK,!0=NACK
+    // [2-3] echo arg (priority/port on OK; zeros on NACK)
+    // [4-7] proto BE u32 (which protocol the register was for)
     if (f.direction == deci3_direction::machine_to_host
         && f.category == 0x0010
         && f.payload.size() >= 8
@@ -123,8 +123,8 @@ void frame_dispatcher::on_frame_received(opentm::tm_core::deci3_frame f) {
     }
 
     // DELETE_PROTO (type=0x02 code=0x02): a protocol registration went away
-    //   payload[2..3]  session id LE u16
-    //   payload[6..7]  category BE u16    0x0020 = tsmp router
+    // payload[2..3] session id LE u16
+    // payload[6..7] category BE u16 0x0020 = tsmp router
     if (f.category == 0x0001 && f.payload.size() >= 4 && std::to_integer<std::uint8_t>(f.payload[0]) == dcmp::type::status && std::to_integer<std::uint8_t>(f.payload[1]) == dcmp::status_code::delete_proto)
     {
         const std::uint16_t notified = static_cast<std::uint16_t>(std::to_integer<std::uint8_t>(f.payload[2])) | (static_cast<std::uint16_t>(std::to_integer<std::uint8_t>(f.payload[3])) << 8);
@@ -178,7 +178,7 @@ void frame_dispatcher::on_frame_received(opentm::tm_core::deci3_frame f) {
 
         const std::uint32_t marker = take >= 8 ? be_u32_at(f.payload, dfmp_header_size + 4) : 0;
 
-        // 0x11 acks the transfer request (result != 0 means it was refused) 
+        // 0x11 acks the transfer request (result!= 0 means it was refused)
         // 0x13 arrives afterwards, unsolicited, when the copy has finished
         if (marker == 0x11 && take >= 16) {
             emit transfer_acked(seq, be_u32_at(f.payload, dfmp_header_size + 12));

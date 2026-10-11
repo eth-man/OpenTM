@@ -49,7 +49,7 @@ TEST_CASE("DBGP: decode process_list reply with one process", "[dbgp]") {
     const auto bytes = from_hex(
         "80000102 00000018 00000004 00000000 00000000"  // header
         "01000500"                                       // payload (1 PID)
-        "a5");                                           // trailer
+        "a5"); // trailer
     const auto r = dbgp::decode_response(bytes);
     REQUIRE(r.has_value());
     REQUIRE(r->cmd         == 0x80000102u);
@@ -77,11 +77,11 @@ TEST_CASE("DBGP: decode user_memory_stat reply", "[dbgp]") {
         "80200008 00000019 0000001c 01000500 00000000"  // header
         "00000000"          // shared_created
         "00010000"          // shared_attached
-        "186b0000"          // local_memory   (390.7 MB)
-        "00060000"          // local_text     (384 KB)
-        "000c0000"          // prx_text       (768 KB)
-        "00050000"          // prx_data       (320 KB)
-        "003a6000"          // remain         (3.6 MB)
+        "186b0000"          // local_memory (390.7 MB)
+        "00060000"          // local_text (384 KB)
+        "000c0000"          // prx_text (768 KB)
+        "00050000"          // prx_data (320 KB)
+        "003a6000"          // remain (3.6 MB)
         "18");
     const auto r = dbgp::decode_response(bytes);
     REQUIRE(r.has_value());

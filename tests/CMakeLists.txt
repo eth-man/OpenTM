@@ -12,6 +12,7 @@ add_executable(tm_core_tests
     test_wol.cpp
     test_cp_client.cpp
     test_dcmp_codec.cpp
+    test_netmp_codec.cpp
     test_host_path_policy.cpp
     test_remote_session.cpp
     ${CMAKE_SOURCE_DIR}/src/tm_ui/target_properties_xml.cpp

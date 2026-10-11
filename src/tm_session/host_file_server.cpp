@@ -182,23 +182,23 @@ void host_file_server::on_frame_received(opentm::tm_core::deci3_frame f) {
 
     QByteArray reply;
     switch (parsed->code) {
-    case drfp_code::init:  reply = handle_init(*parsed);  break;
-    case drfp_code::stat:  reply = handle_stat(*parsed);  break;
-    case drfp_code::open:  reply = handle_open(*parsed);  break;
+    case drfp_code::init:  reply = handle_init(*parsed); break;
+    case drfp_code::stat:  reply = handle_stat(*parsed); break;
+    case drfp_code::open:  reply = handle_open(*parsed); break;
     case drfp_code::close: reply = handle_close(*parsed); break;
-    case drfp_code::read:  reply = handle_read(*parsed);  break;
+    case drfp_code::read:  reply = handle_read(*parsed); break;
     case drfp_code::write: reply = handle_write(*parsed); break;
-    case drfp_code::mkdir:     reply = handle_mkdir(*parsed);     break;
-    case drfp_code::rmdir:     reply = handle_rmdir(*parsed);     break;
-    case drfp_code::dopen:     reply = handle_dopen(*parsed);     break;
-    case drfp_code::dclose:    reply = handle_dclose(*parsed);    break;
-    case drfp_code::dread:     reply = handle_dread(*parsed);     break;
+    case drfp_code::mkdir:     reply = handle_mkdir(*parsed); break;
+    case drfp_code::rmdir:     reply = handle_rmdir(*parsed); break;
+    case drfp_code::dopen:     reply = handle_dopen(*parsed); break;
+    case drfp_code::dclose:    reply = handle_dclose(*parsed); break;
+    case drfp_code::dread:     reply = handle_dread(*parsed); break;
     case drfp_code::ftruncate: reply = handle_ftruncate(*parsed); break;
-    case drfp_code::truncate:  reply = handle_truncate(*parsed);  break;
-    case drfp_code::rename:    reply = handle_rename(*parsed);    break;
-    case drfp_code::unlink:    reply = handle_unlink(*parsed);    break;
+    case drfp_code::truncate:  reply = handle_truncate(*parsed); break;
+    case drfp_code::rename:    reply = handle_rename(*parsed); break;
+    case drfp_code::unlink:    reply = handle_unlink(*parsed); break;
     case drfp_code::fstat: reply = handle_fstat(*parsed); break;
-    case drfp_code::seek:  reply = handle_seek(*parsed);  break;
+    case drfp_code::seek:  reply = handle_seek(*parsed); break;
     default:
         emit log_message(QStringLiteral("    ?? host_file_server: unhandled DRFP code=%1 seq=0x%2 - replying ENOENT").arg(static_cast<int>(parsed->code)).arg(parsed->seq, 8, 16, QChar('0')));
         reply = build_result_reply( static_cast<drfp_code>(static_cast<std::uint32_t>(parsed->code) + 1), parsed->seq, kLv2Enoent);
@@ -667,7 +667,7 @@ QByteArray host_file_server::handle_close(
         return build_result_reply(drfp_code::close_reply, f.seq, kLv2Einval);
     }
     const std::uint32_t fd = read_be_u32(f.payload, 0);
-    if (auto sit = synth_files_.find(fd); sit != synth_files_.end()) {
+    if (auto sit = synth_files_.find(fd); sit!= synth_files_.end()) {
         synth_files_.erase(sit);
         emit log_message(QStringLiteral("    -> DRFP CLOSE fd=0x%1 ok (synthetic)").arg(fd, 0, 16));
         return build_result_reply(drfp_code::close_reply, f.seq, 0);
@@ -693,7 +693,7 @@ QByteArray host_file_server::handle_read(
     const std::uint32_t fd     = read_be_u32(f.payload, 0);
     const std::uint32_t nbytes = read_be_u32(f.payload, 4);
     const std::uint32_t cap    = (nbytes > 0x4000u) ? 0x4000u : nbytes;
-    if (auto sit = synth_files_.find(fd); sit != synth_files_.end()) {
+    if (auto sit = synth_files_.find(fd); sit!= synth_files_.end()) {
         auto& h = sit->second;
         const qint64 remaining = h.content.size() - h.pos;
         const qint64 take = qMin<qint64>(static_cast<qint64>(cap), qMax<qint64>(0, remaining));
@@ -718,7 +718,7 @@ QByteArray host_file_server::handle_fstat(
         return build_result_reply(drfp_code::fstat_reply, f.seq, kLv2Einval);
     }
     const std::uint32_t fd = read_be_u32(f.payload, 0);
-    if (auto sit = synth_files_.find(fd); sit != synth_files_.end()) {
+    if (auto sit = synth_files_.find(fd); sit!= synth_files_.end()) {
         const auto st = synthetic_stat(sit->second.content.size());
         emit log_message(QStringLiteral("    -> DRFP FSTAT fd=0x%1 size=%2 (synthetic)").arg(fd, 0, 16).arg(st.size));
         return build_stat_reply(drfp_code::fstat_reply, f.seq, 0, st);
@@ -746,7 +746,7 @@ QByteArray host_file_server::handle_seek(
     const std::uint64_t off64   = (static_cast<std::uint64_t>(off_hi) << 32) | off_lo;
 
     qint64 target = 0;
-    if (auto sit = synth_files_.find(fd); sit != synth_files_.end()) {
+    if (auto sit = synth_files_.find(fd); sit!= synth_files_.end()) {
         auto& h = sit->second;
         switch (base) {
         case 0: target = static_cast<qint64>(off64); break;
@@ -766,8 +766,8 @@ QByteArray host_file_server::handle_seek(
         return build_result_reply(drfp_code::seek_reply, f.seq, kLv2Ebadf);
     }
     switch (base) {
-    case 0: target = static_cast<qint64>(off64); break;                 
-    case 1: target = it->second->pos() + static_cast<qint64>(off64); break;  
+    case 0: target = static_cast<qint64>(off64); break;
+    case 1: target = it->second->pos() + static_cast<qint64>(off64); break;
     case 2: target = it->second->size() + static_cast<qint64>(off64); break; 
     default:
         return build_result_reply(drfp_code::seek_reply, f.seq, kLv2Einval);

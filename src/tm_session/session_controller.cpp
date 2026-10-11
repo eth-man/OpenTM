@@ -42,7 +42,7 @@ struct netmp_profile {
             b.append(static_cast<char>(port));
         }
         b.append(char((proto >> 24) & 0xff)); b.append(char((proto >> 16) & 0xff));
-        b.append(char((proto >>  8) & 0xff)); b.append(char( proto        & 0xff));
+        b.append(char((proto >>  8) & 0xff)); b.append(char( proto & 0xff));
         if (!cfw) {
             QByteArray name(lpar);
             name.truncate(16);
@@ -172,7 +172,7 @@ void session_controller::send_warmup() {
 
 void session_controller::send_warmup_deregister() {
     using namespace opentm::tm_core;
-    if (!connection_) return;                        
+    if (!connection_) return;
     const netmp_profile prof{ is_cfw_dex() };
     auto dereg_on = [this, &prof](tcp_connection::socket_role role, std::uint8_t prio, std::uint8_t port, std::uint32_t proto, const char* lpar, const QString& tag) {
         deci3_frame f;
@@ -236,7 +236,7 @@ void session_controller::send_dex_tsmp(std::uint16_t cmd, const QByteArray& body
     }
 }
 void session_controller::on_dex_tsmp_reply(std::uint16_t reply_cmd) {
-    if (!is_cfw_dex()) return;            
+    if (!is_cfw_dex()) return;
 
     if (session_ready_) return;
     QByteArray lpar("PS3_LPAR");

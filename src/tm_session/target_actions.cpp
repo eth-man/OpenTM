@@ -343,13 +343,13 @@ void target_actions::send_load_executable(const QString& file, const load_option
     if (opts.rsx_profiling_tool)    d3 |= 0x1ull;
     if (opts.high_memory_footprint) d3 |= 0x2ull;
 
-    append_be_u64(body, 0);                                   // version
-    append_be_u64(body, opts.enable_extra_options ? d0 : 0);  // data[0]
-    append_be_u64(body, opts.enable_extra_options ? 1 : 0);   // data[1]
+    append_be_u64(body, 0); // version
+    append_be_u64(body, opts.enable_extra_options ? d0 : 0); // data[0]
+    append_be_u64(body, opts.enable_extra_options ? 1 : 0); // data[1]
     append_be_u64(body, opts.core_dump ? opts.core_dump_location : 0); // data[2]
-    append_be_u64(body, d3);                                  // data[3]
-    append_be_u64(body, opts.gcm_capture_mode ? 1 : 0);       // data[4]
-    for (int i = 5; i <= 15; ++i) append_be_u64(body, 0);     // data[5..15]
+    append_be_u64(body, d3); // data[3]
+    append_be_u64(body, opts.gcm_capture_mode ? 1 : 0); // data[4]
+    for (int i = 5; i <= 15; ++i) append_be_u64(body, 0); // data[5..15]
 
     emit log_message(tr("    -- LOAD_EXT debug_flags=0x%1 (debug=%2 ppu_dis=%3 spu_dis=%4)"" argc=%5 envc=%6").arg(debug_flags, 8, 16, QChar('0')).arg(opts.enable_debug_module ? 1 : 0).arg(opts.disable_ppu_debug ? 1 : 0).arg(opts.disable_spu_debug ? 1 : 0).arg(argv.size()).arg(envv.size()));
 
@@ -399,15 +399,15 @@ void target_actions::send_settings_apply(const QString& host_path, std::uint32_t
     body.reserve(0x860);
     auto be32 = [&body](std::uint32_t v) { opentm::tm_core::append_be_u32(body, v); };
     const std::uint32_t id = transfer_id_++;
-    be32(0x00000012u);                      // +0x00 param_c = transfer
-    be32(id);                               // +0x04 transfer id (TM: 2,3,4...)
-    be32(0);                                // +0x08
-    be32(0);                                // +0x0C
+    be32(0x00000012u); // +0x00 param_c = transfer
+    be32(id); // +0x04 transfer id (TM: 2,3,4...)
+    be32(0); // +0x08
+    be32(0); // +0x0C
     be32(static_cast<std::uint32_t>(
-             QDateTime::currentSecsSinceEpoch() & 0xffffffffu));  // +0x10
-    be32(0);                                // +0x14
-    be32(file_size);                        // +0x18 source size in bytes
-    be32(id);                               // +0x1C mirrors the id
+             QDateTime::currentSecsSinceEpoch() & 0xffffffffu)); // +0x10
+    be32(0); // +0x14
+    be32(file_size); // +0x18 source size in bytes
+    be32(id); // +0x1C mirrors the id
     QString rel = host_path;
     if (!target_.file_server_dir.isEmpty()) {
         const QDir root(target_.file_server_dir);

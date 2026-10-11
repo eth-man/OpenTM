@@ -49,8 +49,8 @@ cmake --preset %PRESET% || exit /b 1
 if "%PRESET%"=="vs2022" (
     set "BUILD_PRESET=vs2022-debug"
     if /I "%CONFIG%"=="Release" set "BUILD_PRESET=vs2022-release"
-    echo [build.bat] cmake --build --preset !BUILD_PRESET! --parallel %JOBS%
-    cmake --build --preset !BUILD_PRESET! --parallel %JOBS% || exit /b 1
+    echo [build.bat] cmake --build --preset!BUILD_PRESET! --parallel %JOBS%
+    cmake --build --preset!BUILD_PRESET! --parallel %JOBS% || exit /b 1
     set "TEST_PRESET=vs2022-debug"
     set "EXE_DIR=build\vs2022\bin\%CONFIG%"
 ) else (

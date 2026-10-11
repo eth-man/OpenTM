@@ -6,7 +6,7 @@ using opentm::tm_core::cp_boot_params;
 using opentm::tm_core::cp_client;
 
 TEST_CASE("cp_client accepts only the CP's own tokens", "[cp_client]") {
-    CHECK(cp_client::validate(cp_boot_params{}));   // defaults are valid
+    CHECK(cp_client::validate(cp_boot_params{})); // defaults are valid
 
     SECTION("every documented token is accepted") {
         for (const auto& boot : {"dbg", "sys", "rel"}) {
@@ -44,11 +44,11 @@ TEST_CASE("cp_client accepts only the CP's own tokens", "[cp_client]") {
 
     SECTION("a plausible-but-wrong token is refused") {
         cp_boot_params p;
-        p.boot_mode = QStringLiteral("debug");   // page says "dbg"
+        p.boot_mode = QStringLiteral("debug"); // page says "dbg"
         CHECK_FALSE(cp_client::validate(p));
 
         cp_boot_params q;
-        q.model = QStringLiteral("ps3-hdd80");   // no such model
+        q.model = QStringLiteral("ps3-hdd80"); // no such model
         QString bad;
         CHECK_FALSE(cp_client::validate(q, &bad));
         CHECK(bad == QLatin1String("model"));

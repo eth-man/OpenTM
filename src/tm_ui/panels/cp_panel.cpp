@@ -169,7 +169,7 @@ cp_boot_params cp_panel::current_params() const {
     cp_boot_params p;
     for (const auto& g : kGroups) {
         const auto& by_token = buttons_[QLatin1String(g.form_name)];
-        for (auto it = by_token.constBegin(); it != by_token.constEnd(); ++it) {
+        for (auto it = by_token.constBegin(); it!= by_token.constEnd(); ++it) {
             if (it.value()->isChecked()) { p.*g.member = it.key(); break; }
         }
     }

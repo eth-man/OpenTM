@@ -173,7 +173,7 @@ jobs:
       - name: Collect artifacts
         run: |
           mkdir -p dist
-          find artifacts -type f ! -name SHA256SUMS -exec cp {} dist/ \;
+          find artifacts -type f! -name SHA256SUMS -exec cp {} dist/ \;
           cd dist && sha256sum * > SHA256SUMS
           ls -lh
 

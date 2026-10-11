@@ -21,9 +21,9 @@ TEST_CASE("parse_mac accepts the spellings that actually occur", "[wol]") {
 }
 
 TEST_CASE("parse_mac rejects the wrong number of digits", "[wol]") {
-    CHECK_FALSE(parse_mac("00:11:22:33:44").has_value());        // five bytes
-    CHECK_FALSE(parse_mac("00:11:22:33:44:55:AB").has_value());  // seven
-    CHECK_FALSE(parse_mac("00:11:22:33:44:5").has_value());      // odd nibble
+    CHECK_FALSE(parse_mac("00:11:22:33:44").has_value()); // five bytes
+    CHECK_FALSE(parse_mac("00:11:22:33:44:55:AB").has_value()); // seven
+    CHECK_FALSE(parse_mac("00:11:22:33:44:5").has_value()); // odd nibble
     CHECK_FALSE(parse_mac("").has_value());
     CHECK_FALSE(parse_mac("00:11:22:33:44:__").has_value());
     CHECK_FALSE(parse_mac("zz:11:22:33:44:55").has_value());
